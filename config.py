@@ -27,3 +27,6 @@ EMOJI_PATTERN = re.compile(
     "\U000024C2-\U0001F251" 
     "]+"
     )
+
+#
+# stages:

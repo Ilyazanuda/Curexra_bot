@@ -1,16 +1,3 @@
-# import requests
-# from bs4 import BeautifulSoup
-# from config import my_header
-# USD = 'https://www.nbrb.by/statistics/rates/ratesdaily/?p=true&'
-# full_page = requests.get(USD, my_header)
-#
-# print(full_page.content)
-#
-# soup = BeautifulSoup(full_page.content, 'html.parser')
-#
-# convert = soup.findAll(s)
-
-import requests
 from bs4 import BeautifulSoup
 from lxml import etree
 import requests
@@ -34,10 +21,18 @@ eur_sold = float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/ta
 rub_buy = float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/tbody/tr[3]/td[2]')[0].text) / 100
 rub_sold = float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/tbody/tr[3]/td[3]')[0].text) / 100
 
-usd_buy = format(str(usd_buy), '.4f')
-usd_sold = format(str(usd_sold), '.4f')
+usd_buy = float('{:.4f}'.format(usd_buy))
+usd_buy = float('{:.4f}'.format(usd_buy))
+
+eur_buy = float('{:.4f}'.format(eur_buy))
+eur_sold = float('{:.4f}'.format(eur_sold))
+
+rub_buy = float('{:.4f}'.format(rub_buy))
+rub_sold = float('{:.4f}'.format(rub_sold))
+
 print(usd_buy, usd_sold)
 print(eur_buy, eur_sold)
 print(rub_buy, rub_sold)
-#
+
+
 # print(f'usd: {usd}, eur: {eur}')

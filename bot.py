@@ -166,6 +166,8 @@ def bot_answer(message):
     #
     # message.text = re.sub(EMOJI_PATTERN, r'', message.text)
 
+    message.text = re.sub(EMOJI_PATTERN, r'', message.text)
+
     try:
         numb_to_conv = re.sub(EMOJI_PATTERN, r'', message.text)
         numb_to_conv = float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].\d+|)?", numb_to_conv)[0].replace(',', '.')))
@@ -179,18 +181,21 @@ def bot_answer(message):
         converter_rate(message=message, numb=numb_to_conv)
 
     # переход в меню курсов валют
-    elif message.text.lower() == 'курсы валют':
+    elif message.text.lower() in ('\U0001F4C8курсы валют', 'курсы валют', 'курсы'):
         rates(message)
     # переход в меню конвертера
-    elif message.text.lower() == 'конвертер валют':
+    elif message.text.lower() in ('\U0001F4B1конвертер валют', 'конвертер валют', 'конвертер'):
         converter(message)
     # переход в главное меню
-    elif message.text.lower() == '\U0001F4D1к главному меню':
+    elif message.text.lower() in '\U0001F4D1к главному меню':
         menu(message)
     # переход в меню подписки
-    elif message.text.lower() == 'подписка':
+    elif message.text.lower() in ('\U00002705подписка', 'подписка'):
         subscription(message)
-    elif message.text.lower() == 'купить доллар':
+    # elif Bot_DB.get_stage(message.chat.id) in (10, 11, 12, 13):
+
+
+    elif message.text.lower() in ('\U0001F1FA\U0001F1F8купить доллар', 'купить доллар'):
         check_message(message=message)
 
         Bot_DB.update_stage(user_id=message.chat.id, stage=21)
@@ -212,13 +217,14 @@ def bot_answer(message):
         check_message(message=message)
 
         Bot_DB.update_stage(user_id=message.chat.id, stage=23)
-        bot.send_message(message.chat.id, 'Вы выбрали рубль \U0001F1F7\U0001F1FA, '
-                                          'напишите сумму которую хотите конвертировать.')
+        bot.send_message(message.chat.id, 'Вы выбрали рубль \U0001F1F7\U0001F1FA.\n'
+                                          'Напишите сумму, которую хотите конвертировать.')
 
         check_user_db_status(message=message)
     else:
-        bot.send_message(message.chat.id, 'Извините, я не понимаю чего вы хотите.\n'
+        bot.send_message(message.chat.id, 'Извините, я не понимаю, чего вы хотите.\n'
                                           'Напишите сообщение в рамках того меню в котором находитесь.')
+
 
 
 bot.polling(none_stop=True)
