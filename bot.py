@@ -1,24 +1,26 @@
 # импортируем библеотеку для работы с ботом и файл конфига с токеном
 import telebot
-from config import TOKEN, Bot_DB, EMOJI_PATTERN
+from config import TOKEN, Bot_DB, Bot_currency, EMOJI_PATTERN
 from telebot import types
 import re
 
 # создаём бота
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.AsyncTeleBot(TOKEN)
+task = bot.get_me()
+
+a = 0
+for a in range(100):
+    a += 10
 # создаём кнопки
 # главное меню
 button_rates = types.KeyboardButton('\U0001F4C8Курсы валют')
-button_converter = types.KeyboardButton('\U0001F4B1Конвертер валют')
+button_converter = types.KeyboardButton('\U0001F4B0Конвертер валют')
 button_subscription = types.KeyboardButton('\U00002705Подписка')
 # курсы валют
-button_usd_rate = types.KeyboardButton('\U0001F1FA\U0001F1F8Курс доллара ')
-button_eur_rate = types.KeyboardButton('\U0001F1EA\U0001F1FAКурс евро')
-button_rub_rate = types.KeyboardButton('\U0001F1F7\U0001F1FAКурс рос. рубля')
-# конвертер
-button_buy_usd = types.KeyboardButton('\U0001F1FA\U0001F1F8Купить доллар')
-button_buy_eur = types.KeyboardButton('\U0001F1EA\U0001F1FAКупить евро')
-button_buy_rub = types.KeyboardButton('\U0001F1F7\U0001F1FAКупить рубль')
+button_usd = types.KeyboardButton('\U0001F1FA\U0001F1F8USD')
+button_eur = types.KeyboardButton('\U0001F1EA\U0001F1FAEUR')
+button_rub = types.KeyboardButton('\U0001F1F7\U0001F1FARUB')
+button_byn = types.KeyboardButton('\U0001F1E7\U0001F1FEBYN')
 # подписка
 button_sub_morning = types.KeyboardButton('\U0001F3058 утра')
 button_sub_evening = types.KeyboardButton('\U0001F3078 вечера')
@@ -29,8 +31,9 @@ button_into_rates = types.KeyboardButton('\U000021A9\U0001F4C8К курсам в
 button_into_conv = types.KeyboardButton('\U000021A9\U0001F4B1Назад к конвертеру')
 button_into_back = types.KeyboardButton('\U000021A9Назад')
 
-list_emoji = ('\U0001F1FA\U0001F1F8', '\U0001F1EA\U0001F1FA', '\U0001F1F7\U0001F1FA',
-              '\U0001F305', '\U0001F307', '\U0000274C', '\U0001F4D1', '\U0001F4C8', '\U0001F4B1', '\U00002705')
+dict_currency = {1: '\U0001F1FA\U0001F1F8USD', 2: '\U0001F1EA\U0001F1FAEUR', 3: '\U0001F1F7\U0001F1FARUB',
+                 4: '\U0001F1E7\U0001F1FEBYN'}
+
 print('Бот запущен.')
 
 
@@ -39,13 +42,59 @@ def check_message(message):
 
 
 def check_user_db_status(message):
-    print(f'stage: {Bot_DB.get_stage(message.chat.id)}, sub: {Bot_DB.get_sub(message.chat.id)}')
+    print(f'stage: {Bot_DB.get_stage(message.chat.id)}, sub: {Bot_DB.get_sub(message.chat.id)} '
+          f'buy:{Bot_DB.get_buy(message.chat.id)}, sell: {Bot_DB.get_sell(message.chat.id)}')
 
 
-def converter_rate(message, numb):
-    rate = 2.50
-    result = numb * rate
-    return bot.send_message(message.chat.id, f"Количество валюты {numb} можно купить за {str(result)} BYN")
+def first_currency(message):
+    if message.text in ('\U0001F1FA\U0001F1F8USD', 'USD'):
+        Bot_DB.update_stage(user_id=message.chat.id, stage=21)
+        Bot_DB.update_buy(user_id=message.chat.id, buy=1)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.row(button_eur, button_rub, button_byn)
+        markup.row(button_into_back)
+        markup.row(button_into_menu)
+        bot.send_message(message.chat.id,
+                         f"Вы выбрали для приобретения \U0001F1FA\U0001F1F8<b><i>USD</i></b>\n"
+                         f"Выберите валюту из меню для <b>продажи</b>.",
+                         parse_mode='html',
+                         reply_markup=markup)
+    elif message.text in ('\U0001F1EA\U0001F1FAEUR', 'EUR'):
+        Bot_DB.update_stage(user_id=message.chat.id, stage=21)
+        Bot_DB.update_buy(user_id=message.chat.id, buy=2)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.row(button_usd, button_rub, button_byn)
+        markup.row(button_into_back)
+        markup.row(button_into_menu)
+        bot.send_message(message.chat.id,
+                         f"Вы выбрали для приобретения \U0001F1EA\U0001F1FA<b><i>EUR</i></b>\n"
+                         f"Выберите валюту из меню для <b>продажи</b>.",
+                         parse_mode='html',
+                         reply_markup=markup)
+    elif message.text in ('\U0001F1F7\U0001F1FARUB', 'RUB'):
+        Bot_DB.update_stage(user_id=message.chat.id, stage=21)
+        Bot_DB.update_buy(user_id=message.chat.id, buy=3)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.row(button_usd, button_eur, button_byn)
+        markup.row(button_into_back)
+        markup.row(button_into_menu)
+        bot.send_message(message.chat.id,
+                         f"Вы выбрали для приобретения \U0001F1F7\U0001F1FA<b><i>RUB</i></b>\n"
+                         f"Выберите валюту из меню для <b>продажи</b>.",
+                         parse_mode='html',
+                         reply_markup=markup)
+    elif message.text in ('\U0001F1FA\U0001F1F8BYN', 'BYN'):
+        Bot_DB.update_stage(user_id=message.chat.id, stage=21)
+        Bot_DB.update_buy(user_id=message.chat.id, buy=4)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.row(button_eur, button_rub, button_rub)
+        markup.row(button_into_back)
+        markup.row(button_into_menu)
+        bot.send_message(message.chat.id,
+                         f"Вы выбрали для приобретения \U0001F1E7\U0001F1FE<b><i>BYN</i></b>\n"
+                         f"Выберите валюту из меню для <b>продажи</b>.",
+                         parse_mode='html',
+                         reply_markup=markup)
 
 
 # При получении комманды /start и /help выводит меню выбора и текст
@@ -101,9 +150,12 @@ def rates(message):
     Bot_DB.update_stage(user_id=message.chat.id, stage=10)
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row(button_usd_rate, button_eur_rate, button_rub_rate)
+    markup.row(button_usd, button_eur, button_rub)
     markup.row(button_into_menu)
-    bot.send_message(message.chat.id, "Вы перешли в меню курсов валют, выберите валюту из меню.", reply_markup=markup)
+    bot.send_message(message.chat.id, "Вы перешли в меню \U0001F4C8 <b><i>курсы валют</i></b> \U0001F4C8, "
+                                      "выберите валюту из меню.",
+                     parse_mode="html",
+                     reply_markup=markup)
 
     check_user_db_status(message=message)
 
@@ -117,9 +169,12 @@ def converter(message):
     Bot_DB.update_stage(user_id=message.chat.id, stage=20)
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row(button_buy_usd, button_buy_eur, button_buy_rub)
+    markup.row(button_usd, button_eur)
+    markup.row(button_rub, button_byn)
     markup.row(button_into_menu)
-    bot.send_message(message.chat.id, f"Вы перешли в меню конвертации валют, выберите валюту из меню.",
+    bot.send_message(message.chat.id, f"Вы перешли в меню \U0001F4B0 <b><i>конвертации валют</i></b> \U0001F4B0\n"
+                                      f"Выберите валюту из меню, которую желаете <b>приобрести</b>.",
+                     parse_mode='html',
                      reply_markup=markup)
 
     check_user_db_status(message=message)
@@ -136,7 +191,9 @@ def subscription(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_sub_morning, button_sub_evening, button_unsubscribe)
     markup.row(button_into_menu)
-    bot.send_message(message.chat.id, f"Выберите варианты подписки на рассылку обновления валют.",
+    bot.send_message(message.chat.id, f"Пы перешли в меню \U00002705 <b><i>подписки</i></b> \U00002705.\n"
+                                      f"Выберите варианты подписки на рассылку обновления валют.",
+                     parse_mode='html',
                      reply_markup=markup)
 
     check_user_db_status(message=message)
@@ -157,7 +214,8 @@ def unsubscribe(message):
 # При получении текста проходится по условия и выполняет их
 @bot.message_handler(content_types=['text'])
 def bot_answer(message):
-
+    check_message(message=message)
+    check_user_db_status(message=message)
     # try:
     #     emoji_in_message = re.findall(EMOJI_PATTERN, message.text)[0]
     #     print('Module TRY_EMOJI. Emoji in message:', emoji_in_message)
@@ -166,61 +224,72 @@ def bot_answer(message):
     #
     # message.text = re.sub(EMOJI_PATTERN, r'', message.text)
 
-    message.text = re.sub(EMOJI_PATTERN, r'', message.text)
+    # message.text = re.sub(EMOJI_PATTERN, r'', message.text)
 
-    try:
-        numb_to_conv = re.sub(EMOJI_PATTERN, r'', message.text)
-        numb_to_conv = float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].\d+|)?", numb_to_conv)[0].replace(',', '.')))
-    except IndexError:
-        numb_to_conv = None
-        print('Module TRY_NUMB Error, numb_to_conv is not exist.')
-
-    if Bot_DB.get_stage(message.chat.id) in (21, 22, 23) and type(numb_to_conv) is float:
-        print(message.text)
-        check_message(message=message)
-        converter_rate(message=message, numb=numb_to_conv)
+    # try:
+    #     numb_to_conv = re.sub(EMOJI_PATTERN, r'', message.text)
+    #     numb_to_conv = float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].\d+|)?", numb_to_conv)[0].replace(',', '.')))
+    # except IndexError:
+    #     numb_to_conv = None
+    #     print('Module TRY_NUMB Error, numb_to_conv is not exist.')
+    #
+    # if Bot_DB.get_stage(message.chat.id) in (21, 22, 23) and type(numb_to_conv) is float:
+    #     print(message.text)
+    #     check_message(message=message)
+    #     converter_rate(message=message, numb=numb_to_conv)
 
     # переход в меню курсов валют
-    elif message.text.lower() in ('\U0001F4C8курсы валют', 'курсы валют', 'курсы'):
+    if message.text.lower() in ('\U0001F4C8курсы валют', 'курсы валют', 'курсы'):
         rates(message)
     # переход в меню конвертера
-    elif message.text.lower() in ('\U0001F4B1конвертер валют', 'конвертер валют', 'конвертер'):
+    elif message.text.lower() in ('\U0001F4B0конвертер валют', 'конвертер валют', 'конвертер'):
         converter(message)
     # переход в главное меню
-    elif message.text.lower() in '\U0001F4D1к главному меню':
+    elif message.text.lower() in ('\U0001F4D1к главному меню', 'к главному меню'):
         menu(message)
     # переход в меню подписки
     elif message.text.lower() in ('\U00002705подписка', 'подписка'):
         subscription(message)
-    # elif Bot_DB.get_stage(message.chat.id) in (10, 11, 12, 13):
+    # кнопка возврата на начальное меню конвертера
+    elif message.text.lower() in ('\U000021A9назад', 'назад'):
+        if Bot_DB.get_stage(user_id=message.chat.id) == 22:
+            converter(message)
+    elif Bot_DB.get_stage(user_id=message.chat.id) in (20, 21, 22):
+        for i in dict_currency:
+            if message.text in dict_currency[i]:
+                if Bot_DB.get_stage(user_id=message.chat.id) == 20:
+                    first_currency(message=message)
+                elif Bot_DB.get_stage(user_id=message.chat.id) == 21:
+                    for _ in dict_currency:
+                        if message.text in dict_currency[_]:
+                            Bot_DB.update_sell(user_id=message.chat.id, sell=_)
+                            Bot_DB.update_stage(user_id=message.chat.id, stage=22)
+                            bot.send_message(message.chat.id, f'Вы выбрали для продажи <b><i>{dict_currency[_]}</i></b>'
+                                                              f'\nВведите сумму, которую хотите <b>приобрести</b>.',
+                                             parse_mode='html')
+                elif Bot_DB.get_stage(user_id=message.chat.id) == 22:
+                    first_currency(message=message)
+        if Bot_DB.get_stage(user_id=message.chat.id) == 22:
+            message_no_emoji = re.sub(EMOJI_PATTERN, r'', message.text)
+            if message_no_emoji.isdigit():
+                value = float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].\d+|)?",
+                                          message_no_emoji)[0].replace(',', '.')))
+                bot.send_message(message.chat.id, f"Вы можете приобрести <b>{value} "
+                                                  f"{dict_currency[Bot_DB.get_buy(user_id=message.chat.id)]}</b> за <b>"
+                                                  f"{Bot_currency.convert_parse(value, user_id=message.chat.id)}"
+                                                  f" {dict_currency[Bot_DB.get_sell(user_id=message.chat.id)]}</b>",
+                                 parse_mode='html')
 
 
-    elif message.text.lower() in ('\U0001F1FA\U0001F1F8купить доллар', 'купить доллар'):
-        check_message(message=message)
 
-        Bot_DB.update_stage(user_id=message.chat.id, stage=21)
-        bot.send_message(message.chat.id, 'Вы выбрали доллар \U0001F1FA\U0001F1F8, '
-                                          'напишите сумму которую хотите конвертировать.')
 
-        check_user_db_status(message=message)
 
-    elif message.text.lower() == 'купить евро':
-        check_message(message=message)
 
-        Bot_DB.update_stage(user_id=message.chat.id, stage=22)
-        bot.send_message(message.chat.id, 'Вы выбрали евро \U0001F1EA\U0001F1FA, '
-                                          'напишите сумму которую хотите конвертировать.')
 
-        check_user_db_status(message=message)
 
-    elif message.text.lower() == 'купить рубль':
-        check_message(message=message)
 
-        Bot_DB.update_stage(user_id=message.chat.id, stage=23)
-        bot.send_message(message.chat.id, 'Вы выбрали рубль \U0001F1F7\U0001F1FA.\n'
-                                          'Напишите сумму, которую хотите конвертировать.')
 
-        check_user_db_status(message=message)
+
     else:
         bot.send_message(message.chat.id, 'Извините, я не понимаю, чего вы хотите.\n'
                                           'Напишите сообщение в рамках того меню в котором находитесь.')

@@ -11,16 +11,20 @@ class WorkDB:
                                                                  id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                                  user_id INTEGER UNIQUE NOT NULL,
                                                                  stage INTEGER,
-                                                                 sub INTEGER)
+                                                                 sub INTEGER,
+                                                                 buy INTEGER,
+                                                                 sell INTEGER
+                                                                 )
                             ''')
 
     def user_exists(self, user_id):
         result = self.cursor.execute('SELECT id FROM users WHERE user_id = ?', (user_id,))
         return bool(len(result.fetchall()))
 
-    def add_user(self, user_id, stage=0, sub=0):
-        print(f'Создан новый пользователь. user_id: {user_id}, stage: {stage}, sub: {sub}')
-        self.cursor.execute('INSERT INTO users (user_id, stage, sub) VALUES (?, ?, ?)', (user_id, stage, sub))
+    def add_user(self, user_id, stage=0, sub=0, buy=0, sell=0):
+        print(f'Создан новый пользователь. user_id: {user_id}, stage: {stage}, sub: {sub}, buy: {buy}, sell: {sell}')
+        self.cursor.execute('INSERT INTO users (user_id, stage, sub, buy, sell) VALUES (?, ?, ?, ?, ?)',
+                            (user_id, stage, sub, buy, sell))
         return self.conn.commit()
 
     def update_stage(self, user_id, stage):
@@ -38,3 +42,20 @@ class WorkDB:
     def get_sub(self, user_id):
         result = self.cursor.execute('SELECT sub FROM users WHERE user_id = ?', (user_id,))
         return result.fetchone()[0]
+
+    def update_buy(self, user_id, buy):
+        self.cursor.execute('UPDATE users SET buy = ? WHERE user_id = ?', (buy, user_id,))
+        return self.conn.commit()
+
+    def get_buy(self, user_id):
+        result = self.cursor.execute('SELECT buy FROM users WHERE user_id = ?', (user_id,))
+        return result.fetchone()[0]
+
+    def update_sell(self, user_id, sell):
+        self.cursor.execute('UPDATE users SET sell = ? WHERE user_id = ?', (sell, user_id,))
+        return self.conn.commit()
+
+    def get_sell(self, user_id):
+        result = self.cursor.execute('SELECT sell FROM users WHERE user_id = ?', (user_id,))
+        return result.fetchone()[0]
+
