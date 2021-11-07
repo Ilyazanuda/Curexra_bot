@@ -7,15 +7,12 @@ class WorkDB:
     def __init__(self, db_file):
         self.conn = sqlite3.connect(db_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-                                                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                                  user_id INTEGER UNIQUE NOT NULL,
                                                                  stage INTEGER,
                                                                  sub INTEGER,
                                                                  buy INTEGER,
-                                                                 sell INTEGER
-                                                                 )
-                            ''')
+                                                                 sell INTEGER)''')
 
     def user_exists(self, user_id):
         result = self.cursor.execute('SELECT id FROM users WHERE user_id = ?', (user_id,))
@@ -58,4 +55,8 @@ class WorkDB:
     def get_sell(self, user_id):
         result = self.cursor.execute('SELECT sell FROM users WHERE user_id = ?', (user_id,))
         return result.fetchone()[0]
+
+    def get_rates(self,):
+        pass
+
 

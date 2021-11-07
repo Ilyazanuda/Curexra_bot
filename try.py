@@ -25,9 +25,33 @@
 # button_eur = types.KeyboardButton('\U0001F1EA\U0001F1FAEUR')
 # button_rub = types.KeyboardButton('\U0001F1F7\U0001F1FARUB')
 # button_byn = types.KeyboardButton('\U0001F1E7\U0001F1FEBYN')
+# import re
+# message_no_emoji = '2123.213.321'
+# print(True if float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].\d+|)?",
+#                                 message_no_emoji)[0].replace(',', '.'))) else False)
+# print(float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].\d+|)?",
+#                         message_no_emoji)[0].replace(',', '.'))))
 
-dict_currency = {1:'\U0001F1FA\U0001F1F8USD', 2:'\U0001F1EA\U0001F1FAEUR', 3:'\U0001F1F7\U0001F1FARUB',
-                             4:'\U0001F1E7\U0001F1FEBYN'}
-for _ in dict_currency:
-    print(_)
-    print(dict_currency[_])
+import sqlite3
+
+conn = sqlite3.connect('db_db_db.db')
+cur = conn.cursor()
+
+n = "12.5"
+cur.execute('''CREATE TABLE IF NOT EXISTS tab (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                               col1 INTEGER,
+                                               col2 BLOB,
+                                               col3 REAL,
+                                               col4 NUMERIC,
+                                               col5 TEXT)''')
+cur.execute('''INSERT INTO  tab (col1, col2, col3, col4, col5) VALUES (?, ?, ?, ?, ?)''', (n, n, n, n, n))
+
+cur.execute('''SELECT col1, col2, col3, col4, col5 FROM tab WHERE id = 1''')
+result = cur.fetchone()
+print(f'INTEGER: {result[0]} type: {type(result[0])}\n'
+      f'BLOB {result[1]} type: {type(result[1])}\n'
+      f'REAL {result[2]} type: {type(result[2])}\n'
+      f'NUMERIC {result[3]} type: {type(result[3])}\n'
+      f'TEXT {result[4]} type: {type(result[4])}')
+
+
