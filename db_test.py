@@ -13,6 +13,19 @@ class WorkDB:
                                                                  sub INTEGER,
                                                                  buy INTEGER,
                                                                  sell INTEGER)''')
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS rates (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                                 usd_buy INTEGER,
+                                                                 usd_sell INTEGER,
+                                                                 eur_buy INTEGER,
+                                                                 eur_sell INTEGER,
+                                                                 rub_buy INTEGER,
+                                                                 rub_sell INTEGER
+                                                                 sub_time INTEGER)''')
+        self.cursor.execute('''SELECT usd_sell FROM rates WHERE id = 1''')
+        if not self.cursor.fetchone():
+            self.cursor.execute('''INSERT INTO rates (usd_buy, usd_sell, eur_buy, eur_sell, rub_buy, rub_sell, sub_time)
+                                                      VALUES (1, 1, 1, 1, 1, 1, 0)''')
+            self.conn.commit()
 
     def user_exists(self, user_id):
         result = self.cursor.execute('SELECT id FROM users WHERE user_id = ?', (user_id,))
@@ -56,7 +69,25 @@ class WorkDB:
         result = self.cursor.execute('SELECT sell FROM users WHERE user_id = ?', (user_id,))
         return result.fetchone()[0]
 
-    def get_rates(self,):
-        pass
+    def update_rates(self, usd_buy, usd_sell, eur_buy, eur_sell, rub_buy, rub_sell):
+        self.cursor.execute('UPDATE rates SET usd_buy = ?, usd_sell = ?, eur_buy = ?, eur_sell = ?, rub_buy= ?,'
+                            ' rub_sell = ? WHERE id = 1',
+                            (usd_buy, usd_sell, eur_buy, eur_sell, rub_buy, rub_sell))
+        return self.conn.commit()
 
+    def get_rates(self):
+        select = self.cursor.execute('SELECT * FROM rates WHERE id = 1')
+        result = select.fetchone()
+        rates = {'usd_buy': result[1], 'usd_sell': result[2],
+                 'eur_buy': result[3], 'eur_sell': result[4],
+                 'rub_buy': result[5], 'rub_sell': result[6]}
+        return rates
+
+    def update_sub_time(self, sub_time):
+        self.cursor.execute('UPDATE rates SET sub_time = ? WHERE id = 1', (sub_time,))
+        return self.conn.commit()
+
+    def get_sub_time(self):
+        result = self.cursor.execute('SELECT sub_time FROM rates WHERE id = 1')
+        return result.fetchone()[0]
 

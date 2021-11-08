@@ -31,27 +31,14 @@
 #                                 message_no_emoji)[0].replace(',', '.'))) else False)
 # print(float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].\d+|)?",
 #                         message_no_emoji)[0].replace(',', '.'))))
+import time
 
-import sqlite3
-
-conn = sqlite3.connect('db_db_db.db')
-cur = conn.cursor()
-
-n = "12.5"
-cur.execute('''CREATE TABLE IF NOT EXISTS tab (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                               col1 INTEGER,
-                                               col2 BLOB,
-                                               col3 REAL,
-                                               col4 NUMERIC,
-                                               col5 TEXT)''')
-cur.execute('''INSERT INTO  tab (col1, col2, col3, col4, col5) VALUES (?, ?, ?, ?, ?)''', (n, n, n, n, n))
-
-cur.execute('''SELECT col1, col2, col3, col4, col5 FROM tab WHERE id = 1''')
-result = cur.fetchone()
-print(f'INTEGER: {result[0]} type: {type(result[0])}\n'
-      f'BLOB {result[1]} type: {type(result[1])}\n'
-      f'REAL {result[2]} type: {type(result[2])}\n'
-      f'NUMERIC {result[3]} type: {type(result[3])}\n'
-      f'TEXT {result[4]} type: {type(result[4])}')
-
-
+# def time_test():
+#       print(type(time.strftime('%X')))
+#       time.sleep(3)
+#       time_test()
+# time_test()
+time_1 = '10:00:00'
+time_2 = '21:00:00'
+print("time_1", id(time_1))
+print("time_2", id(time_2))

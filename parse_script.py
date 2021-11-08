@@ -1,8 +1,13 @@
 from bs4 import BeautifulSoup
 from lxml import etree
-import sqlite3
 import requests
 import time
+from db_test import WorkDB
+import telebot
+from telebot import types
+from config import TOKEN
+
+bot_auto = telebot.AsyncTeleBot(TOKEN)
 
 
 class Parse:
@@ -13,20 +18,7 @@ class Parse:
                          'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 \
                          (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36',
                          'Accept-Language': 'en-US, en;q=0.5'})
-        self.conn = sqlite3.connect('test.db', check_same_thread=False)
-        self.cursor = self.conn.cursor()
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS rates (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                                 usd_buy INTEGER,
-                                                                 usd_sell INTEGER,
-                                                                 eur_buy INTEGER,
-                                                                 eur_sell INTEGER,
-                                                                 rub_buy INTEGER,
-                                                                 rub_sell INTEGER)''')
-        self.cursor.execute('''SELECT usd_sell FROM rates WHERE id = 1''')
-        if not self.cursor.fetchone():
-            self.cursor.execute('''INSERT INTO rates (usd_buy, usd_sell, eur_buy, eur_sell, rub_buy, rub_sell)
-                                              VALUES (1, 1, 1, 1, 1, 1)''')
-            self.conn.commit()
+        self.Bot_DB = WorkDB('test.db')
 
     def parse_rates(self):
         web_page = requests.get(self.url, headers=self.headers)
@@ -44,14 +36,25 @@ class Parse:
                                                         'tbody/tr[3]/td[2]')[0].text) / 100))
         rub_sell = float('{:.4f}'.format(float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/'
                                                          'tbody/tr[3]/td[3]')[0].text) / 100))
-        self.cursor.execute('''UPDATE rates SET usd_buy = ?, usd_sell = ?, eur_buy = ?,
-                                                eur_sell = ?, rub_buy= ?, rub_sell = ? WHERE id = 1''',
-                            (usd_buy, usd_sell, eur_buy, eur_sell, rub_buy, rub_sell))
-        self.conn.commit()
+        self.Bot_DB.update_rates(usd_buy=usd_buy, usd_sell=usd_sell, eur_buy=eur_buy, eur_sell=eur_sell,
+                                 rub_buy=rub_buy, rub_sell=rub_sell)
+        if "11:17:30" >= time.strftime('%X') >= "11:16:30":
+            if self.Bot_DB.get_sub_time() == 0:
+                print('Делаем рассылку курсов')
+                self.auto_sending()
+                self.Bot_DB.update_sub_time(sub_time=1)
+        else:
+            self.Bot_DB.update_sub_time(sub_time=0)
         print(f'{"-" * 8}\nrates updated\n{"-" * 8}')
-        time.sleep(120)
+        time.sleep(15)
         self.parse_rates()
 
+    def auto_sending(self):
+        # rates_send = Bot_DB.get_rates()
+        # bot.send_message()
+        pass
 
-work = Parse()
-work.parse_rates()
+
+run_script = Parse()
+run_script.parse_rates()
+

@@ -4,9 +4,9 @@ from config import TOKEN, Bot_DB, Bot_currency, EMOJI_PATTERN
 from telebot import types
 import re
 
+
 # создаём бота
 bot = telebot.AsyncTeleBot(TOKEN)
-task = bot.get_me()
 
 # создаём кнопки
 # главное меню
@@ -43,6 +43,9 @@ def check_user_db_status(message):
     print(f'stage: {Bot_DB.get_stage(message.chat.id)}, sub: {Bot_DB.get_sub(message.chat.id)} '
           f'buy:{Bot_DB.get_buy(message.chat.id)}, sell: {Bot_DB.get_sell(message.chat.id)}')
 
+
+def delete_emoji(message):
+    return re.sub(EMOJI_PATTERN, r'', message.text)
 
 def first_currency(message):
     Bot_DB.update_stage(user_id=message.chat.id, stage=21)
@@ -100,10 +103,6 @@ def second_currency(message):
             bot.send_message(message.chat.id, f'Вы выбрали для <b>продажи <i>{dict_currency[_].upper()}</i></b>'
                                               f'\nВведите сумму, которую хотите <b>приобрести</b>.',
                              parse_mode='html')
-
-
-def delete_emoji(message):
-    return re.sub(EMOJI_PATTERN, r'', message.text)
 
 
 # При получении комманды /start и /help выводит меню выбора и текст
