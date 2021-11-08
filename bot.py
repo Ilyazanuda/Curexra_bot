@@ -47,6 +47,7 @@ def check_user_db_status(message):
 def delete_emoji(message):
     return re.sub(EMOJI_PATTERN, r'', message.text)
 
+
 def first_currency(message):
     Bot_DB.update_stage(user_id=message.chat.id, stage=21)
     if message.text.lower() in dict_currency[1]:
@@ -144,7 +145,7 @@ def menu(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_rates, button_converter, button_subscription)
     bot.send_message(message.chat.id, f'Вы перешли в <b><i>главное меню</i></b>.\n'
-                                      f'Я проверяю курс обмена валют в соответствии с НБРБ',
+                                      f'Я проверяю курс обмена валют в соответствии с <b>НБРБ</b>',
                      parse_mode='html',
                      reply_markup=markup)
 
@@ -286,7 +287,7 @@ def bot_answer(message):
         else:
             bot.send_message(message.chat.id, idk_answer)
     except IndexError:
-        print(f"{'-' * 8}\nIndexError{'-' * 8}")
+        print(f"{'-' * 8}\nIndexError\n{'-' * 8}")
 
 
 bot.polling(none_stop=True)

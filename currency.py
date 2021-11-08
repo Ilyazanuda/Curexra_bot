@@ -66,9 +66,3 @@ class Currency:
             if currency in _:
                 values.append(self.dir_rates[_])
         return values
-
-
-test = Currency()
-print(test.convert(100, 1))
-
-

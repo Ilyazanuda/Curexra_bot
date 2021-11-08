@@ -45,13 +45,14 @@ class Parse:
                 self.Bot_DB.update_sub_time(sub_time=1)
         else:
             self.Bot_DB.update_sub_time(sub_time=0)
-        print(f'{"-" * 8}\nrates updated\n{"-" * 8}')
+        print(f'{"-" * 8}\nrates updated\n')
         time.sleep(15)
         self.parse_rates()
 
     def auto_sending(self):
-        # rates_send = Bot_DB.get_rates()
-        # bot.send_message()
+        rates = self.Bot_DB.get_rates()
+
+        # bot_auto.send_message()
         pass
 
 

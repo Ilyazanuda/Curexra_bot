@@ -37,6 +37,9 @@ class WorkDB:
                             (user_id, stage, sub, buy, sell))
         return self.conn.commit()
 
+    def get_users(self):
+        result = self.cursor.execute('SELECT user_id FROM users')
+
     def update_stage(self, user_id, stage):
         self.cursor.execute('UPDATE users SET stage = ? WHERE user_id = ?', (stage, user_id))
         return self.conn.commit()
