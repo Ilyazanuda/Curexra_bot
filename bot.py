@@ -245,13 +245,17 @@ def bot_answer(message):
         elif message.text.lower() in ('\U000021A9назад', 'назад', '/back'):
             if Bot_DB.get_stage(user_id=message.chat.id) in (21, 22):
                 converter(message)
+        # принимает сообщения только с указынными стадиями
         elif Bot_DB.get_stage(user_id=message.chat.id) in (10, 20, 21, 22):
             for i in dict_currency:
                 if message.text.lower() in dict_currency[i]:
+                    # приимает сообщение на стадии 20 (конвертер, выбор первой валюты)
                     if Bot_DB.get_stage(user_id=message.chat.id) == 20:
                         first_currency(message=message)
+                    # принимает сообщение на стадиях 20, 21 (конвертер, выбор второй валюты или изменение выбора)
                     elif Bot_DB.get_stage(user_id=message.chat.id) in (21, 22):
                         second_currency(message=message)
+                    # принимает сообщение на стадии 10 (курсы валют, выбор валюты и перевыбор)
                     elif Bot_DB.get_stage(user_id=message.chat.id) == 10:
                         rates_list = Bot_currency.rates(delete_emoji(message).lower())
                         print(rates_list)
@@ -264,14 +268,15 @@ def bot_answer(message):
                                          parse_mode='html')
                     else:
                         bot.send_message(message.chat.id, idk_answer)
+            # приём сообщения на стадии 22 (конвертер, ввод конвертируемой суммы)
             if Bot_DB.get_stage(user_id=message.chat.id) == 22:
                 message_no_emoji = delete_emoji(message=message)
                 print(message_no_emoji)
                 if float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].?\d+|)?",
                                      message_no_emoji)[0].replace(',', '.'))):
-                    print('check')
                     value = float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].?\d+|)?",
                                               message_no_emoji)[0].replace(',', '.')))
+                    print(f'Пришло число для конвертации {value}')
                     if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
                         answer_convert = (f"Вы можете приобрести <b>{value} "
                                           f"{dict_currency[Bot_DB.get_buy(user_id=message.chat.id)].upper()}</b> за <b>"

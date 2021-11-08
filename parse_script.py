@@ -38,15 +38,15 @@ class Parse:
                                                          'tbody/tr[3]/td[3]')[0].text) / 100))
         self.Bot_DB.update_rates(usd_buy=usd_buy, usd_sell=usd_sell, eur_buy=eur_buy, eur_sell=eur_sell,
                                  rub_buy=rub_buy, rub_sell=rub_sell)
-        if "11:17:30" >= time.strftime('%X') >= "11:16:30":
+        if "22:38:30" >= time.strftime('%X') >= "22:37:30":
             if self.Bot_DB.get_sub_time() == 0:
-                print('Делаем рассылку курсов')
+                print(f'Делаем рассылку курсов {time.strftime("%X")}')
                 self.auto_sending()
                 self.Bot_DB.update_sub_time(sub_time=1)
         else:
             self.Bot_DB.update_sub_time(sub_time=0)
         print(f'{"-" * 8}\nrates updated\n')
-        time.sleep(15)
+        time.sleep(40)
         self.parse_rates()
 
     def auto_sending(self):
