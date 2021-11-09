@@ -1,8 +1,11 @@
 # импортируем библеотеку для работы с ботом и файл конфига с токеном
+import random
+
 import telebot
 from config import TOKEN, Bot_DB, Bot_currency, EMOJI_PATTERN
 from telebot import types
 import re
+from time import sleep
 
 
 # создаём бота
@@ -219,6 +222,18 @@ def unsubscribe(message):
                                       f'<b><i>"Курсы валют"</i></b>\nЯ в вас разочарован...',
                      parse_mode='html')
     check_user_db_status(message=message)
+
+
+@bot.message_handler(content_types=['sticker', 'photo', 'audio'])
+def sticker(message):
+    sticker_list = ((open('stickers\\stick_1_1.webp', 'rb'), open('stickers\\stick_1_2.webp', 'rb')),
+                    (open('stickers\\stick_2_1.webp', 'rb'), open('stickers\\stick_2_2.webp', 'rb')),
+                    (open('stickers\\stick_3_1.webp', 'rb'), open('stickers\\stick_3_2.webp', 'rb')),
+                    (open('stickers\\stick_4_1.webp', 'rb'), open('stickers\\stick_4_2.webp', 'rb')))
+    rand_sticker = random.choice(sticker_list)
+    bot.send_sticker(message.chat.id, rand_sticker[0])
+    sleep(2)
+    bot.send_sticker(message.chat.id, rand_sticker[1])
 
 
 # При получении текста проходится по условия и выполняет их
