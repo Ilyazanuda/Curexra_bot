@@ -144,7 +144,7 @@ def menu(message):
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_rates, button_converter, button_subscription)
-    bot.send_message(message.chat.id, f'Вы перешли в <b><i>Главное меню</i></b>.\n'
+    bot.send_message(message.chat.id, f'Вы перешли в <b><i>Главное меню</i></b>\n'
                                       f'Я проверяю курс обмена валют в соответствии с <b>НБРБ</b>',
                      parse_mode='html',
                      reply_markup=markup)
@@ -163,7 +163,7 @@ def rates(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_usd, button_eur, button_rub)
     markup.row(button_into_menu)
-    bot.send_message(message.chat.id, "Вы перешли в меню \U0001F4C8 <b><i>Курсы валют</i></b> \U0001F4C8.\n"
+    bot.send_message(message.chat.id, "Вы перешли в меню \U0001F4C8 <b><i>Курсы валют</i></b> \U0001F4C8\n"
                                       "Чтобы узнать курс выберите интересующую вас <b>валюту</b>.",
                      parse_mode="html",
                      reply_markup=markup)
@@ -183,7 +183,7 @@ def converter(message):
     markup.row(button_usd, button_eur)
     markup.row(button_rub, button_byn)
     markup.row(button_into_menu)
-    bot.send_message(message.chat.id, f"Вы перешли в меню \U0001F4B0 <b><i>конвертации валют</i></b> \U0001F4B0\n"
+    bot.send_message(message.chat.id, f"Вы перешли в меню \U0001F4B0 <b><i>Конвертации валют</i></b> \U0001F4B0\n"
                                       f"Выберите валюту из меню, которую желаете <b>приобрести</b>.",
                      parse_mode='html',
                      reply_markup=markup)
@@ -216,7 +216,7 @@ def unsubscribe(message):
     check_message(message=message)
     Bot_DB.update_sub(user_id=message.chat.id, sub=0)
     bot.send_message(message.chat.id, f'{message.from_user.first_name}, теперь вы отписаны от рассылки '
-                                      f'<b><i>"Курсы валют"</i></b>',
+                                      f'<b><i>"Курсы валют"</i></b>\nЯ в вас разочарован...',
                      parse_mode='html')
     check_user_db_status(message=message)
 
@@ -248,6 +248,8 @@ def bot_answer(message):
             Bot_DB.update_sub(user_id=message.chat.id, sub=2)
             bot.send_message(message.chat.id, 'Вы подписались на рассылку <b><i>"Курсы валют"</i></b> на 8 вечера.',
                              parse_mode='html')
+        elif message.text.lower() in ('\U0000274Cотписка', 'отписка'):
+            unsubscribe(message=message)
         # кнопка возврата на начальное меню конвертера
         elif message.text.lower() in ('\U000021A9назад', 'назад', '/back'):
             if Bot_DB.get_stage(user_id=message.chat.id) in (21, 22):
