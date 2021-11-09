@@ -1,10 +1,11 @@
 from bs4 import BeautifulSoup
 from lxml import etree
+from work_db import WorkDB
+from config import TOKEN
 import requests
 import time
-from db_test import WorkDB
 import telebot
-from config import TOKEN
+
 
 bot_auto = telebot.AsyncTeleBot(TOKEN)
 
@@ -17,7 +18,7 @@ class Parse:
                          'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 \
                          (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36',
                          'Accept-Language': 'en-US, en;q=0.5'})
-        self.Bot_DB = WorkDB('test.db')
+        self.Bot_DB = WorkDB('database.db')
 
     def parse_rates(self):
         web_page = requests.get(self.url, headers=self.headers)

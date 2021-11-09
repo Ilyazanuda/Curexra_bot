@@ -1,4 +1,3 @@
-# импортируем библеотеку для работы с ботом и файл конфига с токеном
 from config import TOKEN, Bot_DB, Bot_currency, EMOJI_PATTERN
 from telebot import types
 from time import sleep
@@ -6,39 +5,30 @@ import random
 import sqlite3
 import telebot
 import re
-import threading
-
-lock = threading.Lock()
-
-
-# создаём бота
+# create var bot
 bot = telebot.AsyncTeleBot(TOKEN)
-
-# создаём кнопки
-# главное меню
+# create buttons for main menus
 button_rates = types.KeyboardButton('\U0001F4C8Курсы валют')
 button_converter = types.KeyboardButton('\U0001F4B0Конвертер валют')
 button_subscription = types.KeyboardButton('\U0001F4ECРассылка')
-# курсы валют
+# create buttons for currencies
 button_usd = types.KeyboardButton('\U0001F1FA\U0001F1F8USD')
 button_eur = types.KeyboardButton('\U0001F1EA\U0001F1FAEUR')
 button_rub = types.KeyboardButton('\U0001F1F7\U0001F1FARUB')
 button_byn = types.KeyboardButton('\U0001F1E7\U0001F1FEBYN')
-# подписка
+# create buttons for mailing
 button_sub_morning = types.KeyboardButton('\U0001F3058 утра')
 button_sub_evening = types.KeyboardButton('\U0001F3078 вечера')
 button_unsubscribe = types.KeyboardButton('\U0000274CОтписка')
-# внутренние переходы
+# create back buttons
 button_into_menu = types.KeyboardButton('\U0001F4D1К главному меню')
-button_into_rates = types.KeyboardButton('\U000021A9\U0001F4C8К курсам валют')
-button_into_conv = types.KeyboardButton('\U000021A9\U0001F4B1Назад к конвертеру')
 button_into_back = types.KeyboardButton('\U000021A9Назад')
 
-dict_currency = {1: '\U0001F1FA\U0001F1F8usd', 2: '\U0001F1EA\U0001F1FAeur', 3: '\U0001F1F7\U0001F1FArub',
-                 4: '\U0001F1E7\U0001F1FEbyn'}
+dict_currencies = {1: '\U0001F1FA\U0001F1F8usd', 2: '\U0001F1EA\U0001F1FAeur', 3: '\U0001F1F7\U0001F1FArub',
+                   4: '\U0001F1E7\U0001F1FEbyn'}
 idk_answer = 'Извините, я не понимаю, чего вы хотите.\nНапишите сообщение в рамках того меню, в котором находитесь.'
 
-print('Бот запущен.')
+print('Bot launched.')
 
 
 def check_message(message):
@@ -50,7 +40,7 @@ def check_user_db_status(message):
         print(f'stage: {Bot_DB.get_stage(message.chat.id)}, sub: {Bot_DB.get_sub(message.chat.id)} '
               f'buy:{Bot_DB.get_buy(message.chat.id)}, sell: {Bot_DB.get_sell(message.chat.id)}')
     except TypeError:
-        print('пользователя в базе нет')
+        print('User is not in database')
 
 
 def delete_emoji(message):
@@ -59,58 +49,58 @@ def delete_emoji(message):
 
 def first_currency(message):
     Bot_DB.update_stage(user_id=message.chat.id, stage=21)
-    if message.text.lower() in dict_currency[1]:
+    if message.text.lower() in dict_currencies[1]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=1)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_eur, button_rub, button_byn)
         markup.row(button_into_back)
         markup.row(button_into_menu)
         bot.send_message(message.chat.id,
-                         f'Вы выбрали для <b>приобретения <i>{dict_currency[1].upper()}</i></b>\n'
+                         f'Вы выбрали для <b>приобретения <i>{dict_currencies[1].upper()}</i></b>\n'
                          f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html',
                          reply_markup=markup)
-    elif message.text.lower() in dict_currency[2]:
+    elif message.text.lower() in dict_currencies[2]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=2)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_usd, button_rub, button_byn)
         markup.row(button_into_back)
         markup.row(button_into_menu)
         bot.send_message(message.chat.id,
-                         f'Вы выбрали для <b>приобретения <i>{dict_currency[2].upper()}</i></b>\n'
+                         f'Вы выбрали для <b>приобретения <i>{dict_currencies[2].upper()}</i></b>\n'
                          f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html',
                          reply_markup=markup)
-    elif message.text.lower() in dict_currency[3]:
+    elif message.text.lower() in dict_currencies[3]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=3)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_usd, button_eur, button_byn)
         markup.row(button_into_back)
         markup.row(button_into_menu)
         bot.send_message(message.chat.id,
-                         f'Вы выбрали для <b>приобретения <i>{dict_currency[3].upper()}</i></b>\n'
+                         f'Вы выбрали для <b>приобретения <i>{dict_currencies[3].upper()}</i></b>\n'
                          f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html',
                          reply_markup=markup)
-    elif message.text.lower() in dict_currency[4]:
+    elif message.text.lower() in dict_currencies[4]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=4)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_eur, button_rub, button_rub)
         markup.row(button_into_back)
         markup.row(button_into_menu)
         bot.send_message(message.chat.id,
-                         f'Вы выбрали для <b>приобретения <i>{dict_currency[4].upper()}</i></b>\n'
+                         f'Вы выбрали для <b>приобретения <i>{dict_currencies[4].upper()}</i></b>\n'
                          f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html',
                          reply_markup=markup)
 
 
 def second_currency(message):
-    for _ in dict_currency:
-        if message.text.lower() in dict_currency[_]:
+    for _ in dict_currencies:
+        if message.text.lower() in dict_currencies[_]:
             Bot_DB.update_sell(user_id=message.chat.id, sell=_)
             Bot_DB.update_stage(user_id=message.chat.id, stage=22)
-            bot.send_message(message.chat.id, f'Вы выбрали для <b>продажи <i>{dict_currency[_].upper()}</i></b>'
+            bot.send_message(message.chat.id, f'Вы выбрали для <b>продажи <i>{dict_currencies[_].upper()}</i></b>'
                                               f'\nВведите сумму, которую хотите <b>приобрести</b>.',
                              parse_mode='html')
 
@@ -133,11 +123,12 @@ def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_rates, button_converter, button_subscription)
     bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.first_name}!\n'
-                                      f'Я проверяю курс обмена валют в соответствии с Национальным банком Республики '
+                                      f'Я проверяю курс обмена валют в соответствии с лучшими курсами с сайта '
+                                      f'<b><i>myfin.by</i></b> '
                                       f'Беларусь.\nМожете сразу перейти по нужным вам пунктам меню, '
                                       f'введя данные команды:\n'
                                       f'Главное меню - /menu\nМеню курсов валют - /rates\n'
-                                      f'Меню конвертера - /conv, /converter\nПодписка - /subscription',
+                                      f'Меню конвертера - /conv, /converter\nРассылка - /mailing',
                      reply_markup=markup)
 
     check_user_db_status(message=message)
@@ -154,7 +145,8 @@ def menu(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_rates, button_converter, button_subscription)
     bot.send_message(message.chat.id, f'Вы перешли в <b><i>Главное меню</i></b>\n'
-                                      f'Я проверяю курс обмена валют в соответствии с <b>НБРБ</b>',
+                                      f'Я проверяю курс обмена валют в соответствии с лучшими курсами с сайта'
+                                      f'<b><i>myfin.by</i></b>',
                      parse_mode='html',
                      reply_markup=markup)
 
@@ -200,8 +192,8 @@ def converter(message):
     check_user_db_status(message=message)
 
 
-# При получении комманды /subscription
-@bot.message_handler(commands=['subscription', 'sub'])
+# При получении комманды /mailing
+@bot.message_handler(commands=['mailing', 'mail'])
 def subscription(message):
     check_message(message=message)
 
@@ -277,8 +269,8 @@ def bot_answer(message):
                 converter(message)
         # принимает сообщения только с указынными стадиями
         elif Bot_DB.get_stage(user_id=message.chat.id) in (10, 20, 21, 22):
-            for i in dict_currency:
-                if message.text.lower() in dict_currency[i]:
+            for i in dict_currencies:
+                if message.text.lower() in dict_currencies[i]:
                     # приимает сообщение на стадии 20 (конвертер, выбор первой валюты)
                     if Bot_DB.get_stage(user_id=message.chat.id) == 20:
                         first_currency(message=message)
@@ -288,12 +280,11 @@ def bot_answer(message):
                     # принимает сообщение на стадии 10 (курсы валют, выбор валюты и перевыбор)
                     elif Bot_DB.get_stage(user_id=message.chat.id) == 10:
                         rates_list = Bot_currency.rates(delete_emoji(message).lower())
-                        print(rates_list)
                         rates_answer = (f'Курсы указаны в соотвествии с <b>НБРБ</b>\n'
-                                        f'Курс <b>покупки {dict_currency[i].upper()}</b>: {rates_list[0]} '
-                                        f'<b>{dict_currency[4].upper()}</b>\n'
-                                        f'Курс <b>продажи {dict_currency[i].upper()}</b>: {rates_list[1]} '
-                                        f'<b>{dict_currency[4].upper()}</b>')
+                                        f'Курс <b>покупки {dict_currencies[i].upper()}</b>: {rates_list[0]} '
+                                        f'<b>{dict_currencies[4].upper()}</b>\n'
+                                        f'Курс <b>продажи {dict_currencies[i].upper()}</b>: {rates_list[1]} '
+                                        f'<b>{dict_currencies[4].upper()}</b>')
                         bot.send_message(message.chat.id, rates_answer,
                                          parse_mode='html')
                     else:
@@ -301,7 +292,6 @@ def bot_answer(message):
             # приём сообщения на стадии 22 (конвертер, ввод конвертируемой суммы)
             if Bot_DB.get_stage(user_id=message.chat.id) == 22:
                 message_no_emoji = delete_emoji(message=message)
-                print(message_no_emoji)
                 if message_no_emoji.replace(',', '').replace('.', '').isdigit():
                     value = float((re.findall(r'\d+(?:[^a-zA-Z-а-яА-ЯёЁ].?\d+|)?',
                                               message_no_emoji)[0].replace(',', '.')))
@@ -309,9 +299,9 @@ def bot_answer(message):
                     # если валюта покупки != валюте продажи, число передаётся в конвертер, если равна, то выводит сообщ.
                     if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
                         answer_convert = (f'Вы можете приобрести <b>{value} '
-                                          f'{dict_currency[Bot_DB.get_buy(user_id=message.chat.id)].upper()}</b> за <b>'
+                                          f'{dict_currencies[Bot_DB.get_buy(user_id=message.chat.id)].upper()}</b> за <b>'
                                           f'{Bot_currency.convert(value, user_id=message.chat.id)} '
-                                          f'{dict_currency[Bot_DB.get_sell(user_id=message.chat.id)].upper()}</b>')
+                                          f'{dict_currencies[Bot_DB.get_sell(user_id=message.chat.id)].upper()}</b>')
                         bot.send_message(message.chat.id, answer_convert,
                                          parse_mode='html')
                     else:
@@ -345,4 +335,5 @@ def bot_answer(message):
         check_user_db_status(message=message)
 
 
-bot.polling(none_stop=True)
+if __name__ == '__main__':
+        bot.polling(none_stop=True)

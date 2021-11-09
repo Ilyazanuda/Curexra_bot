@@ -1,11 +1,11 @@
-from db_test import WorkDB
+from work_db import WorkDB
 from currency import Currency
 import re
 
 # токен бота
 TOKEN = '2029757069:AAE9x1smImhloyULiyWUOjahm9Ur-G747oU'
 # создаём базу данных где будем отслеживать стадию разговора, id юзера и его подписки
-db_file = 'test.db'
+db_file = 'database.db'
 Bot_DB = WorkDB(db_file)
 # создаём объект работы с валютой
 Bot_currency = Currency()

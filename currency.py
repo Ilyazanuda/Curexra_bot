@@ -1,10 +1,10 @@
-from db_test import WorkDB
+from work_db import WorkDB
 
 
 class Currency:
 
     def __init__(self):
-        self.Bot_DB = WorkDB('test.db')
+        self.Bot_DB = WorkDB('database.db')
         self.dir_rates = self.Bot_DB.get_rates()
 
     def convert(self, value, user_id):
