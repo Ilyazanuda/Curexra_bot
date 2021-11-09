@@ -12,7 +12,7 @@ bot = telebot.AsyncTeleBot(TOKEN)
 # главное меню
 button_rates = types.KeyboardButton('\U0001F4C8Курсы валют')
 button_converter = types.KeyboardButton('\U0001F4B0Конвертер валют')
-button_subscription = types.KeyboardButton('\U00002705Подписка')
+button_subscription = types.KeyboardButton('\U0001F4ECРассылка')
 # курсы валют
 button_usd = types.KeyboardButton('\U0001F1FA\U0001F1F8USD')
 button_eur = types.KeyboardButton('\U0001F1EA\U0001F1FAEUR')
@@ -144,7 +144,7 @@ def menu(message):
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_rates, button_converter, button_subscription)
-    bot.send_message(message.chat.id, f'Вы перешли в <b><i>главное меню</i></b>.\n'
+    bot.send_message(message.chat.id, f'Вы перешли в <b><i>Главное меню</i></b>.\n'
                                       f'Я проверяю курс обмена валют в соответствии с <b>НБРБ</b>',
                      parse_mode='html',
                      reply_markup=markup)
@@ -163,7 +163,7 @@ def rates(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_usd, button_eur, button_rub)
     markup.row(button_into_menu)
-    bot.send_message(message.chat.id, "Вы перешли в меню \U0001F4C8 <b><i>курсы валют</i></b> \U0001F4C8.\n"
+    bot.send_message(message.chat.id, "Вы перешли в меню \U0001F4C8 <b><i>Курсы валют</i></b> \U0001F4C8.\n"
                                       "Чтобы узнать курс выберите интересующую вас <b>валюту</b>.",
                      parse_mode="html",
                      reply_markup=markup)
@@ -194,7 +194,6 @@ def converter(message):
 # При получении комманды /subscription
 @bot.message_handler(commands=['subscription', 'sub'])
 def subscription(message):
-
     check_message(message=message)
 
     Bot_DB.update_stage(user_id=message.chat.id, stage=60)
@@ -202,24 +201,24 @@ def subscription(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_sub_morning, button_sub_evening, button_unsubscribe)
     markup.row(button_into_menu)
-    bot.send_message(message.chat.id, f"Пы перешли в меню \U00002705 <b><i>подписки</i></b> \U00002705.\n"
-                                      f"Выберите варианты подписки на рассылку обновления валют.",
+    bot.send_message(message.chat.id, f'Вы перешли в меню \U0001F4EC <b><i>Рассылка "Курсы валют"</i></b> \U0001F4EC\n'
+                                      f'Выберите варианты подписки на ежедневную рассылку, всё абсолютно '
+                                      f'<b>бесплатно</b>, <b>без смс</b> и <b>регистрации</b>.',
                      parse_mode='html',
                      reply_markup=markup)
 
     check_user_db_status(message=message)
 
 
+# функция отписки
 @bot.message_handler(commands=['unsub', 'unsubscribe'])
 def unsubscribe(message):
-
     check_message(message=message)
-
     Bot_DB.update_sub(user_id=message.chat.id, sub=0)
-
+    bot.send_message(message.chat.id, f'{message.from_user.first_name}, теперь вы отписаны от рассылки '
+                                      f'<b><i>"Курсы валют"</i></b>',
+                     parse_mode='html')
     check_user_db_status(message=message)
-
-    pass
 
 
 # При получении текста проходится по условия и выполняет их
@@ -239,8 +238,16 @@ def bot_answer(message):
         elif message.text.lower() in ('\U0001F4D1к главному меню', 'к главному меню'):
             menu(message)
         # переход в меню подписки
-        elif message.text.lower() in ('\U00002705подписка', 'подписка'):
+        elif message.text.lower() in ('\U0001F4ECрассылка', 'рассылка'):
             subscription(message)
+        elif message.text.lower() in ('\U0001F3058 утра', '8 утра'):
+            Bot_DB.update_sub(user_id=message.chat.id, sub=1)
+            bot.send_message(message.chat.id, 'Вы подписались на рассылку <b><i>"Курсы валют"</i></b> на 8 утра.',
+                             parse_mode='html')
+        elif message.text.lower() in ('\U0001F3078 вечера', '8 вечера'):
+            Bot_DB.update_sub(user_id=message.chat.id, sub=2)
+            bot.send_message(message.chat.id, 'Вы подписались на рассылку <b><i>"Курсы валют"</i></b> на 8 вечера.',
+                             parse_mode='html')
         # кнопка возврата на начальное меню конвертера
         elif message.text.lower() in ('\U000021A9назад', 'назад', '/back'):
             if Bot_DB.get_stage(user_id=message.chat.id) in (21, 22):
@@ -277,6 +284,7 @@ def bot_answer(message):
                     value = float((re.findall(r"\d+(?:[^a-zA-Z-а-яА-ЯёЁ].?\d+|)?",
                                               message_no_emoji)[0].replace(',', '.')))
                     print(f'Пришло число для конвертации {value}')
+                    # если валюта покупки != валюте продажи, число передаётся в конвертер, если равна, то выводит сообщ.
                     if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
                         answer_convert = (f"Вы можете приобрести <b>{value} "
                                           f"{dict_currency[Bot_DB.get_buy(user_id=message.chat.id)].upper()}</b> за <b>"
@@ -288,11 +296,14 @@ def bot_answer(message):
                         bot.send_message(message.chat.id, f"Что-то вы напортачили, "
                                                           f"попробуйте выбрать другую <b>валюту</b>.",
                                          parse_mode='html')
-
         else:
             bot.send_message(message.chat.id, idk_answer)
     except IndexError:
         print(f"{'-' * 8}\nIndexError\n{'-' * 8}")
+    except ValueError:
+        print(f"{'-' * 8}\nValueError\n{'-' * 8}")
+    finally:
+        check_user_db_status(message=message)
 
 
 bot.polling(none_stop=True)

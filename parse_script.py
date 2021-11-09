@@ -4,7 +4,6 @@ import requests
 import time
 from db_test import WorkDB
 import telebot
-from telebot import types
 from config import TOKEN
 
 bot_auto = telebot.AsyncTeleBot(TOKEN)
@@ -38,24 +37,44 @@ class Parse:
                                                          'tbody/tr[3]/td[3]')[0].text) / 100))
         self.Bot_DB.update_rates(usd_buy=usd_buy, usd_sell=usd_sell, eur_buy=eur_buy, eur_sell=eur_sell,
                                  rub_buy=rub_buy, rub_sell=rub_sell)
-        if "22:38:30" >= time.strftime('%X') >= "22:37:30":
+        if "08:02:00" >= time.strftime('%X') >= "08:00:00":
             if self.Bot_DB.get_sub_time() == 0:
                 print(f'Делаем рассылку курсов {time.strftime("%X")}')
-                self.auto_sending()
+                self.mailing(1)
+                self.Bot_DB.update_sub_time(sub_time=1)
+        elif "21:02:00" >= time.strftime('%X') >= "21:00:00":
+            if self.Bot_DB.get_sub_time() == 0:
+                print(f'Делаем рассылку курсов {time.strftime("%X")}')
+                self.mailing(2)
                 self.Bot_DB.update_sub_time(sub_time=1)
         else:
             self.Bot_DB.update_sub_time(sub_time=0)
-        print(f'{"-" * 8}\nrates updated\n')
+        print(f'{"-" * 8}\nrates updated')
         time.sleep(40)
         self.parse_rates()
 
-    def auto_sending(self):
+    def mailing(self, sub):
         rates = self.Bot_DB.get_rates()
-
-        # bot_auto.send_message()
-        pass
+        users_id = self.Bot_DB.get_sub_users(sub=sub)
+        mailing_rates = (f'Ежедневная <b><i>Рассылка "Курсы валют"</i></b>\U0001F4C8 '
+                         f'в соответствии c <b>НБРБ</b> на <b>{time.strftime("%x")}</b>.\n'
+                         f'Курс <b>покупки \U0001F1FA\U0001F1F8USD</b>: {rates["usd_buy"]} '
+                         f'<b>\U0001F1E7\U0001F1FEBYN</b>\n'
+                         f'Курс <b>продажи \U0001F1FA\U0001F1F8USD</b>: {rates["usd_sell"]} '
+                         f'<b>\U0001F1E7\U0001F1FEBYN</b>\n'
+                         f'Курс <b>покупки \U0001F1EA\U0001F1FAEUR</b>: {rates["eur_buy"]} '
+                         f'<b>\U0001F1E7\U0001F1FEBYN</b>\n'
+                         f'Курс <b>продажи \U0001F1EA\U0001F1FAEUR</b>: {rates["eur_sell"]} '
+                         f'<b>\U0001F1E7\U0001F1FEBYN</b>\n'
+                         f'Курс <b>покупки \U0001F1F7\U0001F1FARUB</b>: {rates["rub_buy"]} '
+                         f'<b>\U0001F1E7\U0001F1FEBYN</b>\n'
+                         f'Курс <b>продажи \U0001F1F7\U0001F1FARUB</b>: {rates["rub_sell"]} '
+                         f'<b>\U0001F1E7\U0001F1FEBYN</b>')
+        for chat_id in users_id:
+            bot_auto.send_message(chat_id[0], mailing_rates, parse_mode='html')
 
 
 run_script = Parse()
 run_script.parse_rates()
+
 

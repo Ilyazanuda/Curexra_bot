@@ -37,9 +37,6 @@ class WorkDB:
                             (user_id, stage, sub, buy, sell))
         return self.conn.commit()
 
-    def get_users(self):
-        result = self.cursor.execute('SELECT user_id FROM users')
-
     def update_stage(self, user_id, stage):
         self.cursor.execute('UPDATE users SET stage = ? WHERE user_id = ?', (stage, user_id))
         return self.conn.commit()
@@ -55,6 +52,10 @@ class WorkDB:
     def get_sub(self, user_id):
         result = self.cursor.execute('SELECT sub FROM users WHERE user_id = ?', (user_id,))
         return result.fetchone()[0]
+
+    def get_sub_users(self, sub):
+        result = self.cursor.execute('SELECT user_id FROM users WHERE sub = ?', (sub,))
+        return result.fetchall()
 
     def update_buy(self, user_id, buy):
         self.cursor.execute('UPDATE users SET buy = ? WHERE user_id = ?', (buy, user_id,))
