@@ -16,7 +16,7 @@ Version 0.10.0
     -с помощью pip установить данные пакеты:
         pip install bs4==0.0.1
         pip install pyTelegramBotAPI==4.2.0
-        pip install lxm==4.6.4
+        pip install lxml==4.6.4
     -запустить bot.by и parse_script.py  для начала работы бота;
     -перейти в телеграмме в чат с ботом по @%bot_name%, который вы написали в @BotFather, прописать '/start';
     -вы великолепны!
