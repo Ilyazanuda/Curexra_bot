@@ -5,13 +5,13 @@
 ## LANG ENG
 Hi, this is my first time working with pyTelegramBotAPI. And next info it's small about bot.
 ### This is the working scheme of the TelegramBot:
--using the Sqlite3 data base;
--parsing the currency exchange rates from myfin.by;
--using pyTelegramBotAPI for accepting and replying to user's messages.
+    -using the Sqlite3 data base;
+    -parsing the currency exchange rates from myfin.by;
+    -using pyTelegramBotAPI for accepting and replying to user's messages.
 #### Functions:
--viewing currency exchange rates;
--currency exchange;
--subcription to daily mailing.
+    -viewing currency exchange rates;
+    -currency exchange;
+    -subcription to daily mailing.
 #### Instructions to start working with the bot:
 1. create the bot using @BotFather in Telegram and generate TOKEN;
 2. write the created TOKEN in config.py;
@@ -29,13 +29,13 @@ Hi, this is my first time working with pyTelegramBotAPI. And next info it's smal
 ## LANG RU
 Привет, это моя первая работа с pyTelegramBotAPI. Далее немного информации о боте.
 ### Схема работы данного телеграмбота:
--использование базы данных Sqlite3;
--парсинг курсов валют с сайта НБРБ;
--использование pyTelegramBotAPI для приема/отправки сообщений пользователю.
+    -использование базы данных Sqlite3;
+    -парсинг курсов валют с сайта НБРБ;
+    -использование pyTelegramBotAPI для приема/отправки сообщений пользователю.
 #### Функции:
--просмотр курсов валют;
--обмен валют;
--подписка на ежедневную рассылку.
+    -просмотр курсов валют;
+    -обмен валют;
+    -подписка на ежедневную рассылку.
 #### Порядок действий для начала работы с ботом:
 1. создать бота с помощью @BotFather в telegram и сгенерировать TOKEN;
 2. созданный TOKEN прописать в config.py;
