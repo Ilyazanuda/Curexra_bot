@@ -3,22 +3,16 @@
 ---
 
 ## LANG ENG
-
 Hi, this is my first time working with pyTelegramBotAPI. And next info it's small about bot.
-
 ### This is the working scheme of the TelegramBot:
-
     -using the Sqlite3 data base;
     -parsing the currency exchange rates from myfin.by;
     -using pyTelegramBotAPI for accepting and replying to user's messages.
 #### Functions:
-
     -viewing currency exchange rates;
     -currency exchange;
     -subcription to daily mailing.
-
 #### Instructions to start working with the bot:
-
     1. create the bot using @BotFather in Telegram and generate TOKEN;
     2. write the created TOKEN in config.py;
     3. create virtual environment;
@@ -28,27 +22,21 @@ Hi, this is my first time working with pyTelegramBotAPI. And next info it's smal
         pip install lxml==4.6.4
     5. run bot.py and parse.script.py for starting the bot's work;
     6. go to Telegram to the chat with the bot by @%bot_name% that you've written in @BotFather, write '/start';
-    7. all done, you are **_awesome_**!
+    7. all done, you are **awesome**!
 
 ---
 
 ## LANG RU
-
 Привет, это моя первая работа с pyTelegramBotAPI. Далее немного информации о боте.
-
 ### Схема работы данного телеграмбота:
-
     -использование базы данных Sqlite3;
     -парсинг курсов валют с сайта НБРБ;
     -использование pyTelegramBotAPI для приема/отправки сообщений пользователю.
-
 #### Функции:
     -просмотр курсов валют;
     -обмен валют;
     -подписка на ежедневную рассылку.
-
 #### Порядок действий для начала работы с ботом:
-
     1. создать бота с помощью @BotFather в telegram и сгенерировать TOKEN;
     2. созданный TOKEN прописать в config.py;
     3. создать виртуальную среду;
@@ -58,6 +46,6 @@ Hi, this is my first time working with pyTelegramBotAPI. And next info it's smal
         pip install lxml==4.6.4
     5. запустить bot.by и parse_script.py  для начала работы бота;
     6. перейти в телеграмме в чат с ботом по @%bot_name%, который вы написали в @BotFather, прописать '/start';
-    7. вы великолепны!
+    7. вы **великолепны**!
 
 ---
