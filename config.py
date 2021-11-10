@@ -4,6 +4,8 @@ import re
 
 # create TOKEN
 TOKEN = '2029757069:AAEnh31xRTcVLNZ0PE_3BmvlbfaDqXzxFbs'
+# chat that will receive notifications about errors
+check_chat = (-607441191)
 # create database for bot work with stages, user_id(chat_id) etc
 db_file = 'database.db'
 Bot_DB = WorkDB(db_file)

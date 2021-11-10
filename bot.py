@@ -1,4 +1,4 @@
-from config import TOKEN, Bot_DB, Bot_currency, EMOJI_PATTERN
+from config import TOKEN, Bot_DB, Bot_currency, EMOJI_PATTERN, check_chat
 from telebot import types
 from time import sleep
 import random
@@ -31,12 +31,9 @@ idk_answer = 'Извините, я не понимаю, чего вы хотит
 print('Bot launched.')
 
 
-def check_message(message):
-    print(f'chat_id: {message.chat.id}, user_name: {message.from_user.first_name}, message: {message.text}, '
-          f'time: {time.strftime("%c")}')
-
-
-def check_user_db_status(message):
+def check_request(message):
+    print(f'{"/" + "-" * 90 + "/"}\nchat_id: {message.chat.id}, user_name: {message.from_user.first_name},'
+          f' message: {message.text}, time: {time.strftime("%c")}')
     try:
         print(f'stage: {Bot_DB.get_stage(message.chat.id)}, sub: {Bot_DB.get_sub(message.chat.id)} '
               f'buy:{Bot_DB.get_buy(message.chat.id)}, sell: {Bot_DB.get_sell(message.chat.id)}')
@@ -100,14 +97,14 @@ def second_currency(message):
 
 @bot.message_handler(commands=['start', 'help'])
 def start(message):
-    check_message(message=message)
+    if message.text == '/start':
+        check_request(message=message)
     if not Bot_DB.user_exists(message.chat.id):
         print(f'User "{message.from_user.first_name}" was not found in the database, create a new record...')
         Bot_DB.add_user(message.chat.id)
     else:
         print(f'Record about user "{message.from_user.first_name}" is in the database.')
     Bot_DB.update_stage(user_id=message.chat.id, stage=0)
-    check_user_db_status(message=message)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_rates, button_converter, button_subscription)
     bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.first_name}!\n'
@@ -122,9 +119,9 @@ def start(message):
 
 @bot.message_handler(commands=['menu'])
 def menu(message):
-    check_message(message=message)
+    if message.text == '/menu':
+        check_request(message=message)
     Bot_DB.update_stage(user_id=message.chat.id, stage=0)
-    check_user_db_status(message=message)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_rates, button_converter, button_subscription)
     bot.send_message(message.chat.id, f'Вы перешли в <b><i>Главное меню</i></b>\n'
@@ -135,9 +132,9 @@ def menu(message):
 
 @bot.message_handler(commands=['rates'])
 def rates(message):
-    check_message(message=message)
     Bot_DB.update_stage(user_id=message.chat.id, stage=10)
-    check_user_db_status(message=message)
+    if message.text == '/rates':
+        check_request(message=message)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_usd, button_eur, button_rub)
     markup.row(button_into_menu)
@@ -148,9 +145,9 @@ def rates(message):
 
 @bot.message_handler(commands=['converter', 'conv'])
 def converter(message):
-    check_message(message=message)
+    if message.text in ('/converter', '/conv'):
+        check_request(message=message)
     Bot_DB.update_stage(user_id=message.chat.id, stage=20)
-    check_user_db_status(message=message)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_usd, button_eur)
     markup.row(button_rub, button_byn)
@@ -162,9 +159,9 @@ def converter(message):
 
 @bot.message_handler(commands=['mailing', 'mail'])
 def subscription(message):
-    check_message(message=message)
+    if message.text in ('/mailing', '/mail'):
+        check_request(message=message)
     Bot_DB.update_stage(user_id=message.chat.id, stage=60)
-    check_user_db_status(message=message)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(button_sub_morning, button_sub_evening, button_unsubscribe)
     markup.row(button_into_menu)
@@ -174,12 +171,11 @@ def subscription(message):
                      parse_mode='html', reply_markup=markup)
 
 
-# функция отписки
 @bot.message_handler(commands=['unsub', 'unsubscribe'])
 def unsubscribe(message):
-    check_message(message=message)
+    if message.text in ('/unsub', '/unsubscribe'):
+        check_request(message=message)
     Bot_DB.update_sub(user_id=message.chat.id, sub=0)
-    check_user_db_status(message=message)
     bot.send_message(message.chat.id, f'{message.from_user.first_name}, теперь вы отписаны от рассылки '
                                       f'<b><i>"Курсы валют"</i></b>\nЯ в вас разочарован...',
                      parse_mode='html')
@@ -187,7 +183,7 @@ def unsubscribe(message):
 
 @bot.message_handler(content_types=['sticker', 'photo', 'audio'])
 def sticker(message):
-    check_message(message=message)
+    check_request(message=message)
     rand_sticker = random.choice(((open('stickers\\stick_1_1.webp', 'rb'), open('stickers\\stick_1_2.webp', 'rb')),
                                   (open('stickers\\stick_2_1.webp', 'rb'), open('stickers\\stick_2_2.webp', 'rb')),
                                   (open('stickers\\stick_3_1.webp', 'rb'), open('stickers\\stick_3_2.webp', 'rb')),
@@ -200,7 +196,7 @@ def sticker(message):
 @bot.message_handler(content_types=['text'])
 def bot_answer(message):
     try:
-        check_message(message=message)
+        check_request(message=message)
         if message.text.lower() in ('\U0001F4C8курсы валют', 'курсы валют', 'курсы'):
             rates(message)
         elif message.text.lower() in ('\U0001F4B0конвертер валют', 'конвертер валют', 'конвертер'):
@@ -246,7 +242,7 @@ def bot_answer(message):
                 if message_no_emoji.replace(',', '').replace('.', '').isdigit():
                     value = float((re.findall(r'\d+(?:[^a-zA-Z-а-яА-ЯёЁ].?\d+|)?',
                                               message_no_emoji)[0].replace(',', '.')))
-                    print(f'Пришло число для конвертации {value}')
+                    print(f'The number "{value}" has come and ready for exchange.')
                     if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
                         answer_convert = (f'Вы можете приобрести <b>{value} '
                                           f'{dict_currencies[Bot_DB.get_buy(user_id=message.chat.id)].upper()}</b> за '
@@ -262,19 +258,17 @@ def bot_answer(message):
             bot.send_message(message.chat.id, idk_answer)
     except IndexError:
         print(f"{'-' * 8}\nIndexError\n{'-' * 8}")
-        bot.send_message(-607441191, 'IndexError')
+        bot.send_message(check_chat, 'IndexError')
     except ValueError:
         print(f"{'-' * 8}\nValueError\n{'-' * 8}")
-        bot.send_message(-607441191, 'ValueError')
+        bot.send_message(check_chat, 'ValueError')
     except TypeError:
         bot.send_message(message.chat.id, f'Здравствуйте, <b>{message.from_user.first_name}</b>, вы ещё со мной не '
                                           f'общались, я вас не помню, чтобы я вас записал в книжку, '
                                           f'напишите команду <b>/start</b>',
                          parse_mode='html')
         print(f"{'-' * 8}\nTypeError\n{'-' * 8}")
-        bot.send_message(-607441191, 'TypeError')
-    finally:
-        check_user_db_status(message=message)
+        bot.send_message(check_chat, 'TypeError')
 
 
 if __name__ == '__main__':
