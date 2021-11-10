@@ -6,7 +6,6 @@ import requests
 import time
 import telebot
 
-
 bot_auto = telebot.AsyncTeleBot(TOKEN)
 
 
@@ -40,12 +39,12 @@ class Parse:
                                  rub_buy=rub_buy, rub_sell=rub_sell)
         if "08:02:00" >= time.strftime('%X') >= "08:00:00":
             if self.Bot_DB.get_sub_time() == 0:
-                print(f'Делаем рассылку курсов {time.strftime("%X")}')
+                print(f'Do mailing {time.strftime("%X")}')
                 self.mailing(1)
                 self.Bot_DB.update_sub_time(sub_time=1)
-        elif "21:02:00" >= time.strftime('%X') >= "21:00:00":
+        elif "20:02:00" >= time.strftime('%X') >= "20:00:00":
             if self.Bot_DB.get_sub_time() == 0:
-                print(f'Делаем рассылку курсов {time.strftime("%X")}')
+                print(f'Do mailing {time.strftime("%X")}')
                 self.mailing(2)
                 self.Bot_DB.update_sub_time(sub_time=1)
         else:
@@ -58,7 +57,7 @@ class Parse:
         rates = self.Bot_DB.get_rates()
         users_id = self.Bot_DB.get_sub_users(sub=sub)
         mailing_rates = (f'Ежедневная <b><i>Рассылка "Курсы валют"</i></b>\U0001F4C8 '
-                         f'в соответствии c <b>НБРБ</b> на <b>{time.strftime("%x")}</b>.\n'
+                         f'в соответствии c сервисом <i><b>myfin</b></i> на <b>{time.strftime("%x")}</b>.\n'
                          f'Курс <b>покупки \U0001F1FA\U0001F1F8USD</b>: {rates["usd_buy"]} '
                          f'<b>\U0001F1E7\U0001F1FEBYN</b>\n'
                          f'Курс <b>продажи \U0001F1FA\U0001F1F8USD</b>: {rates["usd_sell"]} '
@@ -75,7 +74,8 @@ class Parse:
             bot_auto.send_message(chat_id[0], mailing_rates, parse_mode='html')
 
 
-run_script = Parse()
-run_script.parse_rates()
+if __name__ == '__main__':
+    run_script = Parse()
+    run_script.parse_rates()
 
 

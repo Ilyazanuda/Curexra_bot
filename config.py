@@ -2,14 +2,14 @@ from work_db import WorkDB
 from currency import Currency
 import re
 
-# токен бота
-TOKEN = '2029757069:AAE9x1smImhloyULiyWUOjahm9Ur-G747oU'
-# создаём базу данных где будем отслеживать стадию разговора, id юзера и его подписки
+# create TOKEN
+TOKEN = '2029757069:AAEnh31xRTcVLNZ0PE_3BmvlbfaDqXzxFbs'
+# create database for bot work with stages, user_id(chat_id) etc
 db_file = 'database.db'
 Bot_DB = WorkDB(db_file)
-# создаём объект работы с валютой
+# object for work with currencies
 Bot_currency = Currency()
-# Эмоджи шаблоны
+# emoji pattern for delete emoji from message
 EMOJI_PATTERN = re.compile(
     "["
     "\U0001F1E0-\U0001F1FF"  # flags (iOS)

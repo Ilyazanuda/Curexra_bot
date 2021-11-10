@@ -4,7 +4,6 @@ import threading
 
 class WorkDB:
 
-    # инициализиуруем инфу для создания таблицы в бд если она не существует
     def __init__(self, db_file):
         self.conn = sqlite3.connect(db_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
@@ -36,7 +35,7 @@ class WorkDB:
 
     def add_user(self, user_id, stage=0, sub=0, buy=0, sell=0):
         with self.lock:
-            print(f'Создан новый пользователь. user_id: {user_id}, stage: {stage}, sub: {sub}, buy: {buy}, sell: {sell}')
+            print(f'Created new user. user_id: {user_id}, stage: {stage}, sub: {sub}, buy: {buy}, sell: {sell}')
             self.cursor.execute('INSERT INTO users (user_id, stage, sub, buy, sell) VALUES (?, ?, ?, ?, ?)',
                                 (user_id, stage, sub, buy, sell))
         return self.conn.commit()
@@ -111,4 +110,3 @@ class WorkDB:
         with self.lock:
             result = self.cursor.execute('SELECT sub_time FROM rates WHERE id = 1')
         return result.fetchone()[0]
-
