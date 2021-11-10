@@ -2,7 +2,6 @@ from config import TOKEN, Bot_DB, Bot_currency, EMOJI_PATTERN
 from telebot import types
 from time import sleep
 import random
-import sqlite3
 import telebot
 import time
 import re
