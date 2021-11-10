@@ -56,8 +56,10 @@ class Parse:
     def mailing(self, sub):
         rates = self.Bot_DB.get_rates()
         users_id = self.Bot_DB.get_sub_users(sub=sub)
+        today = time.strftime("%x")
         mailing_rates = (f'Ежедневная <b><i>Рассылка "Курсы валют"</i></b>\U0001F4C8 '
-                         f'в соответствии c сервисом <i><b>myfin</b></i> на <b>{time.strftime("%x")}</b>.\n'
+                         f'в соответствии c сервисом <i><b>myfin</b></i> на <b>'
+                         f'{today[3:6] + today[:3] + today[6:]}</b>.\n'
                          f'Курс <b>покупки \U0001F1FA\U0001F1F8USD</b>: {rates["usd_buy"]} '
                          f'<b>\U0001F1E7\U0001F1FEBYN</b>\n'
                          f'Курс <b>продажи \U0001F1FA\U0001F1F8USD</b>: {rates["usd_sell"]} '

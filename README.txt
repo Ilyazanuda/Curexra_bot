@@ -1,4 +1,5 @@
-Hello, this bot it's my first work with pyTelegramBotAPI.
+
+Version 0.10.0
 Привет, это моя первая работа с pyTelegramBotAPI.
 Схема работы данного телеграмбота:
     -использование базы данных Sqlite3;
