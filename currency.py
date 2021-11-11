@@ -7,7 +7,7 @@ class Currency:
         self.Bot_DB = WorkDB('database.db')
         self.dir_rates = self.Bot_DB.get_rates()
 
-    def convert(self, value, user_id):
+    def exchange(self, value, user_id):
         if self.Bot_DB.get_buy(user_id=user_id) == 1:
             if self.Bot_DB.get_sell(user_id=user_id) == 2:
                 result = float('{:.2f}'.format(value * (self.dir_rates['usd_sell'] / self.dir_rates['eur_sell'])))

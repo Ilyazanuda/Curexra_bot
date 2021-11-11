@@ -2,11 +2,11 @@ from work_db import WorkDB
 from currency import Currency
 import re
 
-# create TOKEN
-TOKEN = '2029757069:AAEnh31xRTcVLNZ0PE_3BmvlbfaDqXzxFbs'
+# TOKEN from your bot
+TOKEN = '__enter_your_TOKEN__'
 # chat that will receive notifications about errors
-check_chat = (-607441191)
-# create database for bot work with stages, user_id(chat_id) etc
+check_chat = ()
+# database for bot work with stages, user_id(chat_id) etc
 db_file = 'database.db'
 Bot_DB = WorkDB(db_file)
 # object for work with currencies
@@ -30,4 +30,23 @@ EMOJI_PATTERN = re.compile(
     "]+"
     )
 
-
+'''
+database user's status:
+    user_id:
+        unique chat id
+    stage:
+        0 - main menu
+        10 - rates menu
+        20 - convert menu
+        21 - when user chose first currency
+        22 - when user chose second currency and can enter a value to conversion
+    sub:
+        0 - user has not mailing subscription
+        1 - user has mailing subscription in the morning
+        2 - user has mailing subscription in the evening
+    buy/sell:
+        1 - usd
+        2 - eur
+        3 - rub
+        4 - byn
+'''

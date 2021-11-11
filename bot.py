@@ -6,32 +6,33 @@ import telebot
 import time
 import re
 
-# create var bot
+# create object bot
 bot = telebot.AsyncTeleBot(TOKEN)
-# create buttons for main menus
+# main menus buttons
 button_rates = types.KeyboardButton('\U0001F4C8Курсы валют')
 button_converter = types.KeyboardButton('\U0001F4B0Конвертер валют')
 button_subscription = types.KeyboardButton('\U0001F4ECРассылка')
-# create buttons for currencies
+# currencies buttons
 button_usd = types.KeyboardButton('\U0001F1FA\U0001F1F8USD')
 button_eur = types.KeyboardButton('\U0001F1EA\U0001F1FAEUR')
 button_rub = types.KeyboardButton('\U0001F1F7\U0001F1FARUB')
 button_byn = types.KeyboardButton('\U0001F1E7\U0001F1FEBYN')
-# create buttons for mailing
+# mailing buttons
 button_sub_morning = types.KeyboardButton('\U0001F3058 утра')
 button_sub_evening = types.KeyboardButton('\U0001F3078 вечера')
 button_unsubscribe = types.KeyboardButton('\U0000274CОтписка')
 # create back buttons
 button_into_menu = types.KeyboardButton('\U0001F4D1К главному меню')
 button_into_back = types.KeyboardButton('\U000021A9Назад')
-# dict with currencies and flag emoji
+# dict with currencies and emoji_currencies
 dict_curr = {1: ('\U0001F1FA\U0001F1F8usd', 'usd'), 2: ('\U0001F1EA\U0001F1FAeur', 'eur'),
              3: ('\U0001F1F7\U0001F1FArub', 'rub'), 4: ('\U0001F1E7\U0001F1FEbyn', 'byn')}
-
+# error answer template
 idk_answer = 'Извините, я не понимаю, чего вы хотите.\nНапишите сообщение в рамках того меню, в котором находитесь.'
 print('Bot launched.')
 
 
+# information check in terminal
 def check_request(message):
     print(f'{"/" + "-" * 90 + "/"}\nchat_id: {message.chat.id}, user_name: {message.from_user.first_name},'
           f' message: {message.text}, time: {time.strftime("%c")}')
@@ -46,6 +47,7 @@ def delete_emoji(text):
     return re.sub(EMOJI_PATTERN, r'', text)
 
 
+# filter for markup when you chose first currency
 def first_currency(message):
     Bot_DB.update_stage(user_id=message.chat.id, stage=21)
     if message.text.lower() in dict_curr[1]:
@@ -86,6 +88,7 @@ def first_currency(message):
                          parse_mode='html', reply_markup=markup)
 
 
+# when you chose second currency
 def second_currency(message):
     for _ in dict_curr:
         if message.text.lower() in dict_curr[_]:
@@ -96,17 +99,23 @@ def second_currency(message):
                              parse_mode='html')
 
 
+# accepting user's info and filtering according to phrases or commands
 @bot.message_handler(commands=['start', 'help'])
 def start(message):
-    if message.text == '/start':
+    # checking the double check_request call
+    if message.text in ('/start', '/help'):
         check_request(message=message)
+    # checking a user record in the database, and add record if not exist
     if not Bot_DB.user_exists(message.chat.id):
         print(f'User "{message.from_user.first_name}" was not found in the database, create a new record...')
         Bot_DB.add_user(message.chat.id)
     else:
         print(f'Record about user "{message.from_user.first_name}" is in the database.')
+    # work with database
     Bot_DB.update_stage(user_id=message.chat.id, stage=0)
+    # markup on the step
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    # chose buttons for menu
     markup.row(button_rates, button_converter, button_subscription)
     bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.first_name}!\n'
                                       f'Я проверяю курс обмена валют в соответствии с лучшими курсами с сервиса '
@@ -114,7 +123,7 @@ def start(message):
                                       f'Беларусь.\nМожете сразу перейти по нужным вам пунктам меню, '
                                       f'введя данные команды:\n'
                                       f'Главное меню - /menu\nМеню курсов валют - /rates\n'
-                                      f'Меню конвертера - /conv, /converter\nРассылка - /mailing',
+                                      f'Меню конвертера - /conv, /ex, \nРассылка - /mailing',
                      parse_mode='html', reply_markup=markup)
 
 
@@ -144,9 +153,9 @@ def rates(message):
                      parse_mode='html', reply_markup=markup)
 
 
-@bot.message_handler(commands=['converter', 'conv'])
+@bot.message_handler(commands=['converter', 'conv', 'exchange', 'ex'])
 def converter(message):
-    if message.text in ('/converter', '/conv'):
+    if message.text in ('/converter', '/conv', '/exchange', '/ex'):
         check_request(message=message)
     Bot_DB.update_stage(user_id=message.chat.id, stage=20)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -194,6 +203,7 @@ def sticker(message):
     bot.send_sticker(message.chat.id, rand_sticker[1])
 
 
+# received information filter
 @bot.message_handler(content_types=['text'])
 def bot_answer(message):
     try:
@@ -201,7 +211,7 @@ def bot_answer(message):
         message.text = delete_emoji(text=message.text)
         if message.text.lower() in ('курсы валют', 'курсы'):
             rates(message)
-        elif message.text.lower() in ('конвертер валют', 'конвертер'):
+        elif message.text.lower() in ('конвертер валют', 'конвертер', 'обменник', 'обмен'):
             converter(message)
         elif message.text.lower() == 'к главному меню':
             menu(message)
@@ -248,7 +258,7 @@ def bot_answer(message):
                     if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
                         answer_convert = (f'Вы можете приобрести <b>{value} '
                                           f'{dict_curr[Bot_DB.get_buy(user_id=message.chat.id)][0].upper()}</b> за '
-                                          f'<b>{Bot_currency.convert(value, user_id=message.chat.id)} '
+                                          f'<b>{Bot_currency.exchange(value, user_id=message.chat.id)} '
                                           f'{dict_curr[Bot_DB.get_sell(user_id=message.chat.id)][0].upper()}</b>')
                         bot.send_message(message.chat.id, answer_convert, parse_mode='html')
                         break
@@ -261,9 +271,13 @@ def bot_answer(message):
                 bot.send_message(message.chat.id, idk_answer)
         else:
             bot.send_message(message.chat.id, idk_answer)
+    # error processing
     except IndexError:
+        # error check in terminal
         print(f"{'-' * 8}\nIndexError\n{'-' * 8}")
+        # error check in special chat
         bot.send_message(check_chat, 'IndexError')
+        # answer for user
         bot.send_message(message.chat.id, idk_answer)
     except ValueError:
         print(f"{'-' * 8}\nValueError\n{'-' * 8}")

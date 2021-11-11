@@ -37,6 +37,7 @@ class Parse:
                                                          'tbody/tr[3]/td[3]')[0].text) / 100))
         self.Bot_DB.update_rates(usd_buy=usd_buy, usd_sell=usd_sell, eur_buy=eur_buy, eur_sell=eur_sell,
                                  rub_buy=rub_buy, rub_sell=rub_sell)
+        # check when user will has mailing
         if "08:02:00" >= time.strftime('%X') >= "08:00:00":
             if self.Bot_DB.get_sub_time() == 0:
                 print(f'Do mailing {time.strftime("%X")}')
