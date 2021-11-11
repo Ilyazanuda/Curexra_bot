@@ -102,12 +102,17 @@ def second_currency(message):
 
 
 def exchange(message, value):
-    if value > 0:
-        answer_convert = (f'Вы можете приобрести <b>{value} '
-                          f'{dict_curr[Bot_DB.get_buy(user_id=message.chat.id)][0].upper()}</b> за '
-                          f'<b>{Bot_currency.exchange(value, user_id=message.chat.id)} '
-                          f'{dict_curr[Bot_DB.get_sell(user_id=message.chat.id)][0].upper()}</b>')
-        bot.send_message(message.chat.id, answer_convert, parse_mode='html')
+    if value >= 0:
+        if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
+            answer_convert = (f'Вы можете приобрести <b>{value} '
+                              f'{dict_curr[Bot_DB.get_buy(user_id=message.chat.id)][0].upper()}</b> за '
+                              f'<b>{Bot_currency.exchange(value, user_id=message.chat.id)} '
+                              f'{dict_curr[Bot_DB.get_sell(user_id=message.chat.id)][0].upper()}</b>')
+            bot.send_message(message.chat.id, answer_convert, parse_mode='html')
+        else:
+            bot.send_message(message.chat.id, f'Что-то вы напортачили, '
+                                              f'попробуйте выбрать другую <b>валюту</b>.',
+                             parse_mode='html')
     else:
         bot.send_message(message.chat.id, 'Ты самый умный? Как ты собрался отрицательное значение обменивать?',
                          parse_mode='html')
@@ -236,9 +241,9 @@ def bot_answer(message):
                         bot.send_message(message.chat.id, f'{message.text} = {value}',
                                          parse_mode='html')
                     break
-        except (ValueError, NameError, IndexError, SyntaxError, TypeError):
-            bot.send_message(message.chat.id, f'Пиши простые числа, умник и не забывай о математических знаках'
-                                              f' \U0001F921',
+        except (ValueError, NameError, IndexError, SyntaxError, TypeError, ZeroDivisionError):
+            bot.send_message(message.chat.id, f'Пиши простые числа, умник и не забывай о математических знаках,'
+                                              f'и на ноль не дели!!! \U0001F921',
                              parse_mode='html')
             print("eval don't work")
             check_math = 2
@@ -288,14 +293,8 @@ def bot_answer(message):
                     value = float((re.findall(r'\d+(?:[^a-zA-Z-а-яА-ЯёЁ].?\d+|)?',
                                               message.text)[0].replace(',', '.')))
                     print(f'The number "{value}" has come and ready for exchange.')
-                    if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
-                        exchange(message=message, value=value)
-                        break
-                    else:
-                        bot.send_message(message.chat.id, f'Что-то вы напортачили, '
-                                                          f'попробуйте выбрать другую <b>валюту</b>.',
-                                         parse_mode='html')
-                        break
+                    exchange(message=message, value=value)
+                    break
             else:
                 if check_math not in (1, 2):
                     bot.send_message(message.chat.id, idk_answer)
