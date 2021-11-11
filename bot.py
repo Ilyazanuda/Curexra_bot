@@ -230,10 +230,12 @@ def bot_answer(message):
         message.text = delete_emoji(text=message.text)
         check_math = 0
         try:
-            for _ in ('+', '-', '/', '*', 'π', '^'):
-                if _ in message.text:
+            for symbol in ('+', '-', '/', '*', 'π', '^', 'x'):
+                if symbol in message.text:
+                    if symbol == "^" and len(message.text) > 4:
+                        break
                     value = float("{:.2f}".format(eval(message.text.replace('^', '**').replace('π', '3.14')
-                                                       .replace(',', '.'))))
+                                                       .replace(',', '.').replace('x', '*'))))
                     check_math = 1
                     if Bot_DB.get_stage(user_id=message.chat.id) == 22:
                         exchange(message=message, value=value)
