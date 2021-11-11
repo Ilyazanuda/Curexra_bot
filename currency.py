@@ -14,7 +14,7 @@ class Currency:
                 return result
 
             elif self.Bot_DB.get_sell(user_id=user_id) == 3:
-                result = float('{:.2f}'.format(value * (dir_rates['usd_sell'] / dir_rates['rub_sell'] / 100)))
+                result = float('{:.2f}'.format(value * (dir_rates['usd_sell'] / dir_rates['rub_sell'] * 100)))
                 return result
 
             elif self.Bot_DB.get_sell(user_id=user_id) == 4:
@@ -27,7 +27,7 @@ class Currency:
                 return result
 
             elif self.Bot_DB.get_sell(user_id=user_id) == 3:
-                result = float('{:.2f}'.format(value * (dir_rates['eur_sell'] / dir_rates['rub_sell'] / 100)))
+                result = float('{:.2f}'.format(value * (dir_rates['eur_sell'] / dir_rates['rub_sell'] * 100)))
                 return result
 
             elif self.Bot_DB.get_sell(user_id=user_id) == 4:
@@ -57,7 +57,7 @@ class Currency:
                 return result
 
             elif self.Bot_DB.get_sell(user_id=user_id) == 3:
-                result = float('{:.2f}'.format(value * (1 / dir_rates['rub_buy'] / 100)))
+                result = float('{:.2f}'.format(value * (1 / dir_rates['rub_buy'] * 100)))
                 return result
 
     def rates(self, currency):

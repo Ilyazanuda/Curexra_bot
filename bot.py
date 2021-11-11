@@ -82,7 +82,7 @@ def first_currency(message):
     elif message.text.lower() in dict_curr[4]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=4)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        markup.row(button_eur, button_rub, button_rub)
+        markup.row(button_usd, button_eur, button_rub)
         markup.row(button_into_back)
         markup.row(button_into_menu)
         bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_curr[4][0].upper()}</i></b>\n'
@@ -211,6 +211,21 @@ def bot_answer(message):
     try:
         check_request(message=message)
         message.text = delete_emoji(text=message.text)
+        check_math = 0
+        try:
+            for _ in ('+', '-', '/', '*', 'π', '^'):
+                if _ in message.text:
+                    value = message.text.replace('^', '**').replace('π', '3.14').replace(',', '.')
+                    bot.send_message(message.chat.id, f'{message.text} = {("{:.2f}".format(eval(value)))}',
+                                     parse_mode='html')
+                    check_math = 1
+                    break
+        except (ValueError, NameError, IndexError, SyntaxError):
+            bot.send_message(message.chat.id, f'Пиши простые числа, умник и не забывай о математических знаках'
+                                              f' \U0001F921',
+                             parse_mode='html')
+            print("eval don't work")
+            check_math = 2
         if message.text.lower() in ('курсы валют', 'курсы'):
             rates(message)
         elif message.text.lower() in ('конвертер валют', 'конвертер', 'обменник', 'обмен'):
@@ -270,9 +285,11 @@ def bot_answer(message):
                                          parse_mode='html')
                         break
             else:
-                bot.send_message(message.chat.id, idk_answer)
+                if check_math not in (1, 2):
+                    bot.send_message(message.chat.id, idk_answer)
         else:
-            bot.send_message(message.chat.id, idk_answer)
+            if check_math not in (1, 2):
+                bot.send_message(message.chat.id, idk_answer)
     # error processing
     except IndexError:
         # error check in terminal
