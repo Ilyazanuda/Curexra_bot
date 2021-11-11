@@ -246,7 +246,7 @@ def bot_answer(message):
                     else:
                         bot.send_message(message.chat.id, f'{message.text} = {value}',
                                          parse_mode='html')
-                    break
+                        break
         except (ValueError, NameError, IndexError, SyntaxError, TypeError, ZeroDivisionError):
             bot.send_message(message.chat.id, f'Пиши простые числа, умник, и не забывай о математических знаках, '
                                               f'и что на ноль делить нельзя!!! \U0001F921',
