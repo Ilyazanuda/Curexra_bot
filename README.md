@@ -1,4 +1,4 @@
-# @CurexraBOT Version 0.10.0
+# @CurexraBOT Version 0.10.02
 My contacts:
 * telegram: @ilyazanuda
 * ilyazanuda@gmail.com
