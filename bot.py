@@ -248,8 +248,8 @@ def bot_answer(message):
                                          parse_mode='html')
                     break
         except (ValueError, NameError, IndexError, SyntaxError, TypeError, ZeroDivisionError):
-            bot.send_message(message.chat.id, f'Пиши простые числа, умник и не забывай о математических знаках,'
-                                              f'и на ноль не дели!!! \U0001F921',
+            bot.send_message(message.chat.id, f'Пиши простые числа, умник, и не забывай о математических знаках, '
+                                              f'и что на ноль делить нельзя!!! \U0001F921',
                              parse_mode='html')
             print("eval don't work")
             check_math = 2
