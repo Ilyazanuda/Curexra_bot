@@ -32,7 +32,7 @@ EMOJI_PATTERN = re.compile(
 
 '''
 database:
-    tab 'user' store ususer's status:
+    tab 'user' store user's status:
         user_id:
             unique chat id
         stage:
