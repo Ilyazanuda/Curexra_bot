@@ -25,8 +25,10 @@ button_unsubscribe = types.KeyboardButton('\U0000274CОтписка')
 button_into_menu = types.KeyboardButton('\U0001F4D1К главному меню')
 button_into_back = types.KeyboardButton('\U000021A9Назад')
 # dict with currencies and emoji_currencies
-dict_curr = {1: ('\U0001F1FA\U0001F1F8usd', 'usd'), 2: ('\U0001F1EA\U0001F1FAeur', 'eur'),
-             3: ('\U0001F1F7\U0001F1FArub', 'rub'), 4: ('\U0001F1E7\U0001F1FEbyn', 'byn')}
+dict_curr = {1: ('\U0001F1FA\U0001F1F8usd', 'usd', '\U0001F1FA\U0001F1F8USD'),
+             2: ('\U0001F1EA\U0001F1FAeur', 'eur', '\U0001F1EA\U0001F1FAEUR'),
+             3: ('\U0001F1F7\U0001F1FArub', 'rub', 'за 100 \U0001F1F7\U0001F1FARUB'),
+             4: ('\U0001F1E7\U0001F1FEbyn', 'byn', '\U0001F1E7\U0001F1FEBYN')}
 # error answer template
 idk_answer = 'Извините, я не понимаю, чего вы хотите.\nНапишите сообщение в рамках того меню, в котором находитесь.'
 print('Bot launched.')
@@ -242,11 +244,11 @@ def bot_answer(message):
                         second_currency(message=message)
                         break
                     elif Bot_DB.get_stage(user_id=message.chat.id) == 10:
-                        rates_list = Bot_currency.rates(delete_emoji(text=message.text).lower())
+                        rates_list = Bot_currency.rates(message.text.lower())
                         rates_answer = (f'Курсы указаны в соотвествии с лучшими курсами <i><b>myfin</b></i>\n'
-                                        f'Курс <b>покупки {dict_curr[i][0].upper()}</b>: {rates_list[0]} '
+                                        f'Курс <b>покупки {dict_curr[i][2]}</b>: {rates_list[0]} '
                                         f'<b>{dict_curr[4][0].upper()}</b>\n'
-                                        f'Курс <b>продажи {dict_curr[i][0].upper()}</b>: {rates_list[1]} '
+                                        f'Курс <b>продажи {dict_curr[i][2]}</b>: {rates_list[1]} '
                                         f'<b>{dict_curr[4][0].upper()}</b>')
                         bot.send_message(message.chat.id, rates_answer, parse_mode='html')
                         break

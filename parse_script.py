@@ -23,6 +23,7 @@ class Parse:
         web_page = requests.get(self.url, headers=self.headers)
         soup = BeautifulSoup(web_page.content, 'html.parser')
         dom = etree.HTML(str(soup))
+        # parsing currencies rates
         usd_buy = float('{:.4f}'.format(float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/'
                                                         'tbody/tr[1]/td[2]')[0].text)))
         usd_sell = float('{:.4f}'.format(float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/'
@@ -32,21 +33,21 @@ class Parse:
         eur_sell = float('{:.4f}'.format(float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/'
                                                          'tbody/tr[2]/td[3]')[0].text)))
         rub_buy = float('{:.4f}'.format(float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/'
-                                                        'tbody/tr[3]/td[2]')[0].text) / 100))
+                                                        'tbody/tr[3]/td[2]')[0].text)))
         rub_sell = float('{:.4f}'.format(float(dom.xpath('//*[@id="workarea"]/div[1]/div[2]/div/div/div/div/table/'
-                                                         'tbody/tr[3]/td[3]')[0].text) / 100))
+                                                         'tbody/tr[3]/td[3]')[0].text)))
         self.Bot_DB.update_rates(usd_buy=usd_buy, usd_sell=usd_sell, eur_buy=eur_buy, eur_sell=eur_sell,
                                  rub_buy=rub_buy, rub_sell=rub_sell)
         # check when user will has mailing
         if "08:02:00" >= time.strftime('%X') >= "08:00:00":
             if self.Bot_DB.get_sub_time() == 0:
                 print(f'Do mailing {time.strftime("%X")}')
-                self.mailing(1)
+                self.mailing(sub=1)
                 self.Bot_DB.update_sub_time(sub_time=1)
         elif "20:02:00" >= time.strftime('%X') >= "20:00:00":
             if self.Bot_DB.get_sub_time() == 0:
                 print(f'Do mailing {time.strftime("%X")}')
-                self.mailing(2)
+                self.mailing(sub=2)
                 self.Bot_DB.update_sub_time(sub_time=1)
         else:
             self.Bot_DB.update_sub_time(sub_time=0)
