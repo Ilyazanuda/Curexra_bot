@@ -232,11 +232,14 @@ def bot_answer(message):
         try:
             for symbol in ('+', '-', '/', '*', 'π', '^', 'x'):
                 if symbol in message.text:
+                    check_math = 1
                     if symbol == "^" and len(message.text) > 4:
+                        bot.send_message(message.chat.id, f'Ты не такой богатый, дружочек. Выбери сумму поменьше',
+                                         parse_mode='html')
+
                         break
                     value = float("{:.2f}".format(eval(message.text.replace('^', '**').replace('π', '3.14')
                                                        .replace(',', '.').replace('x', '*'))))
-                    check_math = 1
                     if Bot_DB.get_stage(user_id=message.chat.id) == 22:
                         exchange(message=message, value=value)
                     else:
