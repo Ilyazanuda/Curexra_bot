@@ -229,6 +229,7 @@ def bot_answer(message):
         check_request(message=message)
         message.text = delete_emoji(text=message.text)
         check_math = 0
+        # simple calc
         try:
             for symbol in ('+', '-', '/', '*', 'π', '^', 'x'):
                 if symbol in message.text:
