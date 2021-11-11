@@ -101,6 +101,18 @@ def second_currency(message):
                              parse_mode='html')
 
 
+def exchange(message, value):
+    if value > 0:
+        answer_convert = (f'Вы можете приобрести <b>{value} '
+                          f'{dict_curr[Bot_DB.get_buy(user_id=message.chat.id)][0].upper()}</b> за '
+                          f'<b>{Bot_currency.exchange(value, user_id=message.chat.id)} '
+                          f'{dict_curr[Bot_DB.get_sell(user_id=message.chat.id)][0].upper()}</b>')
+        bot.send_message(message.chat.id, answer_convert, parse_mode='html')
+    else:
+        bot.send_message(message.chat.id, 'Ты самый умный? Как ты собрался отрицательное значение обменивать?',
+                         parse_mode='html')
+
+
 # accepting user's info and filtering according to phrases or commands
 @bot.message_handler(commands=['start', 'help'])
 def start(message):
@@ -215,12 +227,16 @@ def bot_answer(message):
         try:
             for _ in ('+', '-', '/', '*', 'π', '^'):
                 if _ in message.text:
-                    value = message.text.replace('^', '**').replace('π', '3.14').replace(',', '.')
-                    bot.send_message(message.chat.id, f'{message.text} = {("{:.2f}".format(eval(value)))}',
-                                     parse_mode='html')
+                    value = float("{:.2f}".format(eval(message.text.replace('^', '**').replace('π', '3.14')
+                                                       .replace(',', '.'))))
                     check_math = 1
+                    if Bot_DB.get_stage(user_id=message.chat.id) == 22:
+                        exchange(message=message, value=value)
+                    else:
+                        bot.send_message(message.chat.id, f'{message.text} = {value}',
+                                         parse_mode='html')
                     break
-        except (ValueError, NameError, IndexError, SyntaxError):
+        except (ValueError, NameError, IndexError, SyntaxError, TypeError):
             bot.send_message(message.chat.id, f'Пиши простые числа, умник и не забывай о математических знаках'
                                               f' \U0001F921',
                              parse_mode='html')
@@ -273,11 +289,7 @@ def bot_answer(message):
                                               message.text)[0].replace(',', '.')))
                     print(f'The number "{value}" has come and ready for exchange.')
                     if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
-                        answer_convert = (f'Вы можете приобрести <b>{value} '
-                                          f'{dict_curr[Bot_DB.get_buy(user_id=message.chat.id)][0].upper()}</b> за '
-                                          f'<b>{Bot_currency.exchange(value, user_id=message.chat.id)} '
-                                          f'{dict_curr[Bot_DB.get_sell(user_id=message.chat.id)][0].upper()}</b>')
-                        bot.send_message(message.chat.id, answer_convert, parse_mode='html')
+                        exchange(message=message, value=value)
                         break
                     else:
                         bot.send_message(message.chat.id, f'Что-то вы напортачили, '
@@ -309,6 +321,11 @@ def bot_answer(message):
                          parse_mode='html')
         print(f"{'-' * 8}\nTypeError\n{'-' * 8}")
         bot.send_message(check_chat, 'TypeError')
+    except OverflowError:
+        bot.send_message(message.chat.id, f'Ты не такой богатый, дружочек. Выбери сумму поменьше.',
+                         parse_mode='html')
+        print(f"{'-' * 8}\nOverflowError\n{'-' * 8}")
+        bot.send_message(check_chat, 'OverflowError')
 
 
 if __name__ == '__main__':

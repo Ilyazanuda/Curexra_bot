@@ -3,7 +3,7 @@ from currency import Currency
 import re
 
 # enter your bot TOKEN
-TOKEN = '2029757069:AAEnh31xRTcVLNZ0PE_3BmvlbfaDqXzxFbs'
+TOKEN = ''
 # enter chat id, you will receive there notifications about errors
 check_chat = ()
 # database for bot work with stages, user_id(chat_id) etc
