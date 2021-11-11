@@ -1,4 +1,7 @@
 # @CurexraBOT Version 0.10.0
+My contacts:
+* telegram: @ilyazanuda
+* ilyazanuda@gmail.com
 
 ---
 
@@ -11,7 +14,7 @@ Hi, this is my first time working with pyTelegramBotAPI. And next info it's smal
 #### Functions:
 * viewing currency exchange rates;
 * currency exchange;
-* subcription to daily mailing.
+* subscription to daily mailing.
 #### Instructions to start working with the bot:
 1. create the bot using @BotFather in Telegram and generate TOKEN;
 2. write the created TOKEN in config.py;

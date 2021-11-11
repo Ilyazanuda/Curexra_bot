@@ -25,8 +25,9 @@ button_unsubscribe = types.KeyboardButton('\U0000274CОтписка')
 button_into_menu = types.KeyboardButton('\U0001F4D1К главному меню')
 button_into_back = types.KeyboardButton('\U000021A9Назад')
 # dict with currencies and flag emoji
-dict_currencies = {1: '\U0001F1FA\U0001F1F8usd', 2: '\U0001F1EA\U0001F1FAeur', 3: '\U0001F1F7\U0001F1FArub',
-                   4: '\U0001F1E7\U0001F1FEbyn'}
+dict_curr = {1: ('\U0001F1FA\U0001F1F8usd', 'usd'), 2: ('\U0001F1EA\U0001F1FAeur', 'eur'),
+             3: ('\U0001F1F7\U0001F1FArub', 'rub'), 4: ('\U0001F1E7\U0001F1FEbyn', 'byn')}
+
 idk_answer = 'Извините, я не понимаю, чего вы хотите.\nНапишите сообщение в рамках того меню, в котором находитесь.'
 print('Bot launched.')
 
@@ -38,7 +39,7 @@ def check_request(message):
         print(f'stage: {Bot_DB.get_stage(message.chat.id)}, sub: {Bot_DB.get_sub(message.chat.id)} '
               f'buy:{Bot_DB.get_buy(message.chat.id)}, sell: {Bot_DB.get_sell(message.chat.id)}')
     except TypeError:
-        print('User was not found in database')
+        print('User was not found in the database.')
 
 
 def delete_emoji(text):
@@ -47,50 +48,50 @@ def delete_emoji(text):
 
 def first_currency(message):
     Bot_DB.update_stage(user_id=message.chat.id, stage=21)
-    if message.text.lower() in dict_currencies[1]:
+    if message.text.lower() in dict_curr[1]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=1)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_eur, button_rub, button_byn)
         markup.row(button_into_back)
         markup.row(button_into_menu)
-        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_currencies[1].upper()}</i></b>\n'
+        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_curr[1][0].upper()}</i></b>\n'
                                           f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html', reply_markup=markup)
-    elif message.text.lower() in dict_currencies[2]:
+    elif message.text.lower() in dict_curr[2]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=2)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_usd, button_rub, button_byn)
         markup.row(button_into_back)
         markup.row(button_into_menu)
-        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_currencies[2].upper()}</i></b>\n'
+        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_curr[2][0].upper()}</i></b>\n'
                                           f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html', reply_markup=markup)
-    elif message.text.lower() in dict_currencies[3]:
+    elif message.text.lower() in dict_curr[3]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=3)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_usd, button_eur, button_byn)
         markup.row(button_into_back)
         markup.row(button_into_menu)
-        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_currencies[3].upper()}</i></b>\n'
+        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_curr[3][0].upper()}</i></b>\n'
                                           f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html', reply_markup=markup)
-    elif message.text.lower() in dict_currencies[4]:
+    elif message.text.lower() in dict_curr[4]:
         Bot_DB.update_buy(user_id=message.chat.id, buy=4)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.row(button_eur, button_rub, button_rub)
         markup.row(button_into_back)
         markup.row(button_into_menu)
-        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_currencies[4].upper()}</i></b>\n'
+        bot.send_message(message.chat.id, f'Вы выбрали для <b>приобретения <i>{dict_curr[4][0].upper()}</i></b>\n'
                                           f'Выберите валюту из меню для <b>продажи</b>.',
                          parse_mode='html', reply_markup=markup)
 
 
 def second_currency(message):
-    for _ in dict_currencies:
-        if message.text.lower() in dict_currencies[_]:
+    for _ in dict_curr:
+        if message.text.lower() in dict_curr[_]:
             Bot_DB.update_sell(user_id=message.chat.id, sell=_)
             Bot_DB.update_stage(user_id=message.chat.id, stage=22)
-            bot.send_message(message.chat.id, f'Вы выбрали для <b>продажи <i>{dict_currencies[_].upper()}</i></b>'
+            bot.send_message(message.chat.id, f'Вы выбрали для <b>продажи <i>{dict_curr[_][0].upper()}</i></b>'
                                               f'\nВведите сумму, которую хотите <b>приобрести</b>.',
                              parse_mode='html')
 
@@ -197,71 +198,77 @@ def sticker(message):
 def bot_answer(message):
     try:
         check_request(message=message)
-        if message.text.lower() in ('\U0001F4C8курсы валют', 'курсы валют', 'курсы'):
+        message.text = delete_emoji(text=message.text)
+        if message.text.lower() in ('курсы валют', 'курсы'):
             rates(message)
-        elif message.text.lower() in ('\U0001F4B0конвертер валют', 'конвертер валют', 'конвертер'):
+        elif message.text.lower() in ('конвертер валют', 'конвертер'):
             converter(message)
-        elif message.text.lower() in ('\U0001F4D1к главному меню', 'к главному меню'):
+        elif message.text.lower() == 'к главному меню':
             menu(message)
-        elif message.text.lower() in ('\U0001F4ECрассылка', 'рассылка'):
+        elif message.text.lower() == 'рассылка':
             subscription(message)
-        elif message.text.lower() in ('\U0001F3058 утра', '8 утра'):
+        elif message.text.lower() == '8 утра':
             Bot_DB.update_sub(user_id=message.chat.id, sub=1)
             bot.send_message(message.chat.id, 'Вы подписались на ежедневную рассылку <b><i>"Курсы валют"</i></b>, '
                                               'которая будет производится в 8 утра.',
                              parse_mode='html')
-        elif message.text.lower() in ('\U0001F3078 вечера', '8 вечера'):
+        elif message.text.lower() == '8 вечера':
             Bot_DB.update_sub(user_id=message.chat.id, sub=2)
             bot.send_message(message.chat.id, 'Вы подписались на рассылку <b><i>"Курсы валют"</i></b>, '
                                               'которая будет производится в 8 вечера.',
                              parse_mode='html')
-        elif message.text.lower() in ('\U0000274Cотписка', 'отписка'):
+        elif message.text.lower() in ('отписка', 'unub'):
             unsubscribe(message=message)
-        elif message.text.lower() in ('\U000021A9назад', 'назад', '/back'):
+        elif message.text.lower() in ('назад', '/back'):
             if Bot_DB.get_stage(user_id=message.chat.id) in (21, 22):
                 converter(message)
         elif Bot_DB.get_stage(user_id=message.chat.id) in (10, 20, 21, 22):
-            for i in dict_currencies:
-                if message.text.lower() in dict_currencies[i]:
+            for i in dict_curr:
+                if message.text.lower() in dict_curr[i]:
                     if Bot_DB.get_stage(user_id=message.chat.id) == 20:
                         first_currency(message=message)
+                        break
                     elif Bot_DB.get_stage(user_id=message.chat.id) in (21, 22):
                         second_currency(message=message)
+                        break
                     elif Bot_DB.get_stage(user_id=message.chat.id) == 10:
                         rates_list = Bot_currency.rates(delete_emoji(text=message.text).lower())
                         rates_answer = (f'Курсы указаны в соотвествии с лучшими курсами <i><b>myfin</b></i>\n'
-                                        f'Курс <b>покупки {dict_currencies[i].upper()}</b>: {rates_list[0]} '
-                                        f'<b>{dict_currencies[4].upper()}</b>\n'
-                                        f'Курс <b>продажи {dict_currencies[i].upper()}</b>: {rates_list[1]} '
-                                        f'<b>{dict_currencies[4].upper()}</b>')
+                                        f'Курс <b>покупки {dict_curr[i][0].upper()}</b>: {rates_list[0]} '
+                                        f'<b>{dict_curr[4][0].upper()}</b>\n'
+                                        f'Курс <b>продажи {dict_curr[i][0].upper()}</b>: {rates_list[1]} '
+                                        f'<b>{dict_curr[4][0].upper()}</b>')
                         bot.send_message(message.chat.id, rates_answer, parse_mode='html')
-                    else:
-                        bot.send_message(message.chat.id, idk_answer)
-            if Bot_DB.get_stage(user_id=message.chat.id) == 22:
-                message_no_emoji = delete_emoji(text=message.text)
-                if message_no_emoji.replace(',', '').replace('.', '').isdigit():
+                        break
+                elif Bot_DB.get_stage(user_id=message.chat.id) == 22 and \
+                        message.text.replace(',', '').replace('.', '').replace(' ', '').isdigit():
                     value = float((re.findall(r'\d+(?:[^a-zA-Z-а-яА-ЯёЁ].?\d+|)?',
-                                              message_no_emoji)[0].replace(',', '.')))
+                                              message.text)[0].replace(',', '.')))
                     print(f'The number "{value}" has come and ready for exchange.')
                     if Bot_DB.get_buy(user_id=message.chat.id) != Bot_DB.get_sell(user_id=message.chat.id):
                         answer_convert = (f'Вы можете приобрести <b>{value} '
-                                          f'{dict_currencies[Bot_DB.get_buy(user_id=message.chat.id)].upper()}</b> за '
+                                          f'{dict_curr[Bot_DB.get_buy(user_id=message.chat.id)][0].upper()}</b> за '
                                           f'<b>{Bot_currency.convert(value, user_id=message.chat.id)} '
-                                          f'{dict_currencies[Bot_DB.get_sell(user_id=message.chat.id)].upper()}</b>')
-                        bot.send_message(message.chat.id, answer_convert,
-                                         parse_mode='html')
+                                          f'{dict_curr[Bot_DB.get_sell(user_id=message.chat.id)][0].upper()}</b>')
+                        bot.send_message(message.chat.id, answer_convert, parse_mode='html')
+                        break
                     else:
                         bot.send_message(message.chat.id, f'Что-то вы напортачили, '
                                                           f'попробуйте выбрать другую <b>валюту</b>.',
                                          parse_mode='html')
+                        break
+            else:
+                bot.send_message(message.chat.id, idk_answer)
         else:
             bot.send_message(message.chat.id, idk_answer)
     except IndexError:
         print(f"{'-' * 8}\nIndexError\n{'-' * 8}")
         bot.send_message(check_chat, 'IndexError')
+        bot.send_message(message.chat.id, idk_answer)
     except ValueError:
         print(f"{'-' * 8}\nValueError\n{'-' * 8}")
         bot.send_message(check_chat, 'ValueError')
+        bot.send_message(message.chat.id, idk_answer)
     except TypeError:
         bot.send_message(message.chat.id, f'Здравствуйте, <b>{message.from_user.first_name}</b>, вы ещё со мной не '
                                           f'общались, я вас не помню, чтобы я вас записал в книжку, '
