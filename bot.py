@@ -114,7 +114,7 @@ def exchange(message, value):
                                               f'попробуйте выбрать другую <b>валюту</b>.',
                              parse_mode='html')
     else:
-        bot.send_message(message.chat.id, 'Ты самый умный? Как ты собрался отрицательное значение обменивать?',
+        bot.send_message(message.chat.id, 'Нельзя обменивать отрицательное значение. Напишите другую сумму',
                          parse_mode='html')
 
 
@@ -235,7 +235,7 @@ def bot_answer(message):
                 if symbol in message.text:
                     check_math = 1
                     if symbol == "^" and len(message.text) > 4:
-                        bot.send_message(message.chat.id, f'Ты не такой богатый, дружочек. Выбери сумму поменьше',
+                        bot.send_message(message.chat.id, f'Не думаю что вы настолько богаты. Выберите сумму поменьше',
                                          parse_mode='html')
 
                         break
@@ -248,8 +248,8 @@ def bot_answer(message):
                                          parse_mode='html')
                         break
         except (ValueError, NameError, IndexError, SyntaxError, TypeError, ZeroDivisionError):
-            bot.send_message(message.chat.id, f'Пиши простые числа, умник, и не забывай о математических знаках, '
-                                              f'и что на ноль делить нельзя!!! \U0001F921',
+            bot.send_message(message.chat.id, f'Используйте простые числа, не забывайте о математических знаках '
+                                              f'и что деление на ноль запрещено. \U0001F921',
                              parse_mode='html')
             print("eval don't work")
             check_math = 2
@@ -327,7 +327,7 @@ def bot_answer(message):
         print(f"{'-' * 8}\nTypeError\n{'-' * 8}")
         bot.send_message(check_chat, 'TypeError')
     except OverflowError:
-        bot.send_message(message.chat.id, f'Ты не такой богатый, дружочек. Выбери сумму поменьше.',
+        bot.send_message(message.chat.id, f'Не думаю что вы настолько богаты. Выберите сумму поменьше.',
                          parse_mode='html')
         print(f"{'-' * 8}\nOverflowError\n{'-' * 8}")
         bot.send_message(check_chat, 'OverflowError')

@@ -81,5 +81,3 @@ class Parse:
 if __name__ == '__main__':
     run_script = Parse()
     run_script.parse_rates()
-
-
