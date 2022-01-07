@@ -234,8 +234,10 @@ def bot_answer(message):
             for symbol in ('+', '-', '/', '*', 'π', '^', 'x'):
                 if symbol in message.text:
                     check_math = 1
+                    message.text = ''.join((re.findall(r'\d+|\W+', message.text))).replace(',', '.').replace(' ', '')
+                    print(f'Message after regex: {message.text}')
                     if symbol == "^" and len(message.text) > 4:
-                        bot.send_message(message.chat.id, f'Не думаю что вы настолько богаты. Выберите сумму поменьше',
+                        bot.send_message(message.chat.id, f'Ты не такой богатый, дружочек. Выбери сумму поменьше',
                                          parse_mode='html')
 
                         break
